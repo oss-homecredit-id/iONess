@@ -16,7 +16,7 @@ public protocol DuplicatedHandler {
 public enum RequestDuplicatedDecision<Param> {
     case dropAndRequestAgain
     case dropAndRequestAgainWithCompletion((Param?, URLResponse?, Error?) -> Void)
-    case ignoreCurrentRequest
+    case ignoreCurrentCompletion
     case useCurrentCompletion
     case useBothCompletion
     case useCompletion((Param?, URLResponse?, Error?) -> Void)
@@ -37,9 +37,9 @@ public class DefaultDuplicatedHandler: DuplicatedHandler {
     )
     
     public static var keepFirstCompletion: DefaultDuplicatedHandler = .init(
-        duplicatedDownloadDecision: .ignoreCurrentRequest,
-        duplicatedUploadDecision: .ignoreCurrentRequest,
-        duplicatedDataDecision: .ignoreCurrentRequest
+        duplicatedDownloadDecision: .ignoreCurrentCompletion,
+        duplicatedUploadDecision: .ignoreCurrentCompletion,
+        duplicatedDataDecision: .ignoreCurrentCompletion
     )
     
     public static var keepLatestCompletion: DefaultDuplicatedHandler = .init(
