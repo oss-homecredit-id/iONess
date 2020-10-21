@@ -13,7 +13,7 @@
 		607FACDB1AFB9204008FA782 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 607FACD91AFB9204008FA782 /* Main.storyboard */; };
 		607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDC1AFB9204008FA782 /* Images.xcassets */; };
 		607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDE1AFB9204008FA782 /* LaunchScreen.xib */; };
-		607FACEC1AFB9204008FA782 /* Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACEB1AFB9204008FA782 /* Tests.swift */; };
+		73562F61253FDD560063EEC3 /* IntegratedTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73562F60253FDD560063EEC3 /* IntegratedTest.swift */; };
 		DF53A4C88324D6B58FAC52D1 /* Pods_iONess_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 82DB49C06D5FF9CD1FB3650A /* Pods_iONess_Tests.framework */; };
 /* End PBXBuildFile section */
 
@@ -40,9 +40,9 @@
 		607FACDF1AFB9204008FA782 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
 		607FACE51AFB9204008FA782 /* iONess_Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = iONess_Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		607FACEA1AFB9204008FA782 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		607FACEB1AFB9204008FA782 /* Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tests.swift; sourceTree = "<group>"; };
 		61E6CD8C4565024E1C7CB3B6 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
 		692206617FDF7BB0DC2ED947 /* Pods-iONess_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-iONess_Example.release.xcconfig"; path = "Target Support Files/Pods-iONess_Example/Pods-iONess_Example.release.xcconfig"; sourceTree = "<group>"; };
+		73562F60253FDD560063EEC3 /* IntegratedTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntegratedTest.swift; sourceTree = "<group>"; };
 		82DB49C06D5FF9CD1FB3650A /* Pods_iONess_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_iONess_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		96F91EE4A5D9A716C943568A /* Pods-iONess_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-iONess_Tests.debug.xcconfig"; path = "Target Support Files/Pods-iONess_Tests/Pods-iONess_Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		C676819A125F6B968302329A /* iONess.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = iONess.podspec; path = ../iONess.podspec; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
@@ -115,7 +115,7 @@
 		607FACE81AFB9204008FA782 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
-				607FACEB1AFB9204008FA782 /* Tests.swift */,
+				73562F60253FDD560063EEC3 /* IntegratedTest.swift */,
 				607FACE91AFB9204008FA782 /* Supporting Files */,
 			);
 			path = Tests;
@@ -361,7 +361,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				607FACEC1AFB9204008FA782 /* Tests.swift in Sources */,
+				73562F61253FDD560063EEC3 /* IntegratedTest.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
