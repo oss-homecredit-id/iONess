@@ -8,14 +8,7 @@
 import Foundation
 
 public class DropableDataRequest<Response: URLResponse>: BaseDropableURLRequest<Response, URLResult> {
-    lazy var task: URLSessionDataTask = Self.request(
-        for: self,
-        in: session,
-        with: request,
-        retryControl,
-        urlValidator,
-        completion
-    )
+    var task: URLSessionDataTask!
     public override var status: DropableStatus<Response> {
         switch task.state {
         case .canceling:
@@ -35,19 +28,26 @@ public class DropableDataRequest<Response: URLResponse>: BaseDropableURLRequest<
         }
     }
     
-    init(session: URLSession,
+    init(networkSessionManager: NetworkSessionManager,
          request: URLRequest,
          retryControl: RetryControl?,
          urlValidator: URLValidator?,
          completion: @escaping (URLResult) -> Void) {
         super.init(
-            session: session,
+            networkSessionManager: networkSessionManager,
             request: request,
             urlValidator: urlValidator,
             retryControl: retryControl,
             completion: completion
         )
-        task.resume()
+        task = Self.request(
+            for: self,
+            in: networkSessionManager,
+            with: request,
+            retryControl,
+            urlValidator,
+            completion
+        )
     }
     
     public override func drop() {
@@ -56,25 +56,27 @@ public class DropableDataRequest<Response: URLResponse>: BaseDropableURLRequest<
     
     static func request(
         for dropable: DropableDataRequest?,
-        in session: URLSession,
+        in networkSessionManager: NetworkSessionManager,
         with request: URLRequest,
         _ retryControl: RetryControl?,
         _ validator: URLValidator?,
         _ completion: @escaping (URLResult) -> Void) -> URLSessionDataTask {
-        session.dataTask(with: request) { [weak dropable] data, response, error in
+        networkSessionManager.dataTask(with: request) { [weak dropable] data, response, error in
+            var shouldRunCompletion: Bool = true
             if let requestError = error ?? validate(response: response, with: validator) {
-                retryIfShould(with: retryControl, error: requestError, request: request, response) {
+                let retried = retryIfShould(with: retryControl, error: requestError, request: request, response) {
                     dropable?.task = Self.request(
                         for: dropable,
-                        in: session,
+                        in: networkSessionManager,
                         with: request,
                         retryControl,
                         validator,
                         completion
                     )
                 }
-                return
+                shouldRunCompletion = !retried
             }
+            guard shouldRunCompletion else { return }
             completion(
                 .init(
                     response: response,

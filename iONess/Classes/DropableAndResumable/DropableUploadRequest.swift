@@ -9,15 +9,7 @@ import Foundation
 
 public class DropableUploadRequest<Response: URLResponse>: BaseDropableURLRequest<Response, URLResult> {
     let fileUrl: URL
-    lazy var task: URLSessionUploadTask = Self.upload(
-        for: self,
-        in: session,
-        with: request,
-        fromFile: fileUrl,
-        retryControl,
-        urlValidator,
-        completion
-    )
+    var task: URLSessionUploadTask!
     public override var status: DropableStatus<Response> {
         switch task.state {
         case .canceling:
@@ -37,7 +29,7 @@ public class DropableUploadRequest<Response: URLResponse>: BaseDropableURLReques
         }
     }
     
-    init(session: URLSession,
+    init(networkSessionManager: NetworkSessionManager,
          request: URLRequest,
          fileUrl: URL,
          retryControl: RetryControl?,
@@ -45,13 +37,21 @@ public class DropableUploadRequest<Response: URLResponse>: BaseDropableURLReques
          completion: @escaping (URLResult) -> Void) {
         self.fileUrl = fileUrl
         super.init(
-            session: session,
+            networkSessionManager: networkSessionManager,
             request: request,
             urlValidator: urlValidator,
             retryControl: retryControl,
             completion: completion
         )
-        task.resume()
+        task = Self.upload(
+            for: self,
+            in: networkSessionManager,
+            with: request,
+            fromFile: fileUrl,
+            retryControl,
+            urlValidator,
+            completion
+        )
     }
     
     public override func drop() {
@@ -60,18 +60,19 @@ public class DropableUploadRequest<Response: URLResponse>: BaseDropableURLReques
     
     static func upload(
         for promise: DropableUploadRequest,
-        in session: URLSession,
+        in networkSessionManager: NetworkSessionManager,
         with request: URLRequest,
         fromFile url: URL,
         _ retryControl: RetryControl?,
         _ validator: URLValidator?,
         _ completion: @escaping (URLResult) -> Void) -> URLSessionUploadTask {
-        session.uploadTask(with: request, fromFile: url) { data, response, error in
+        networkSessionManager.uploadTask(with: request, fromFile: url) { data, response, error in
+            var shouldRunCompletion: Bool = true
             if let requestError = error ?? validate(response: response, with: validator) {
-                retryIfShould(with: retryControl, error: requestError, request: request, response) {
+                let retried = retryIfShould(with: retryControl, error: requestError, request: request, response) {
                     promise.task = Self.upload(
                         for: promise,
-                        in: session,
+                        in: networkSessionManager,
                         with: request,
                         fromFile: url,
                         retryControl,
@@ -79,8 +80,9 @@ public class DropableUploadRequest<Response: URLResponse>: BaseDropableURLReques
                         completion
                     )
                 }
-                return
+                shouldRunCompletion = !retried
             }
+            guard shouldRunCompletion else { return }
             completion(
                 .init(
                     response: response,

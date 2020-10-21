@@ -78,7 +78,7 @@ public class NetworkSessionError: NSError, NetworkSessionErrorProtocol {
     init(originalError: Error? = nil, statusCode: Int = -1, description: String? = nil) {
         self.originalError = originalError
         let desc: String = description ?? (NetworkSessionError.statusCodeMesage[statusCode] ?? "Unknown Error")
-        super.init(domain: "namada.eatr", code: statusCode, userInfo: [NSLocalizedDescriptionKey: desc])
+        super.init(domain: "homecredit.co.id.ioness", code: statusCode, userInfo: [NSLocalizedDescriptionKey: desc])
     }
     
     required init?(coder: NSCoder) {

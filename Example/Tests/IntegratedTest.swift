@@ -13,8 +13,104 @@ import iONess
 
 class IntegratedTestSpec: QuickSpec {
     override func spec() {
-        it("should get json data") {
+        it("should merge two completion") {
             let randomNumber: Int = .random(in: 0..<10)
+            var firstResult: URLResult?
+            var secondResult: URLResult?
+            let request = Ness(onDuplicated: .keepAllCompletion)
+                .httpRequest(.get, withUrl: "https://jsonplaceholder.typicode.com/todos/\(randomNumber)")
+                .prepareDataRequest()
+            request.then { result in
+                firstResult = result
+            }
+            waitUntil(timeout: 15) { done in
+                request.then { result in
+                    secondResult = result
+                    done()
+                }
+            }
+            guard let fResult = firstResult,
+                  let sResult = secondResult,
+                  let fMessage = fResult.httpMessage,
+                  let sMessage = sResult.httpMessage else {
+                fail("Fail to get data")
+                return
+            }
+            expect(fResult.isSucceed).to(equal(sResult.isSucceed))
+            expect(fMessage.isHaveBody).to(equal(sMessage.isHaveBody))
+            expect(fMessage.body).to(equal(sMessage.body))
+            expect(fMessage.headers).to(equal(sMessage.headers))
+        }
+        it("should drop first completion") {
+            let randomNumber: Int = .random(in: 10..<20)
+            var firstResult: URLResult?
+            var secondResult: URLResult?
+            let request = Ness(onDuplicated: .dropPreviousRequest)
+                .httpRequest(.get, withUrl: "https://jsonplaceholder.typicode.com/todos/\(randomNumber)")
+                .prepareDataRequest()
+            request.then { result in
+                firstResult = result
+            }
+            waitUntil(timeout: 15) { done in
+                request.then { result in
+                    secondResult = result
+                    done()
+                }
+            }
+            guard let fResult = firstResult,
+                  let sResult = secondResult else {
+                fail("Fail to get data")
+                return
+            }
+            expect(fResult.isSucceed).to(beFalse())
+            expect(sResult.isSucceed).to(beTrue())
+        }
+        it("should use first completion") {
+            let randomNumber: Int = .random(in: 20..<30)
+            var firstResult: URLResult?
+            let request = Ness(onDuplicated: .keepFirstCompletion)
+                .httpRequest(.get, withUrl: "https://jsonplaceholder.typicode.com/todos/\(randomNumber)")
+                .prepareDataRequest()
+            waitUntil(timeout: 15) { done in
+                request.then { result in
+                    firstResult = result
+                    done()
+                }
+                request.then { _ in
+                    fail("This completion should not be executed")
+                    done()
+                }
+            }
+            guard let fResult = firstResult else {
+                fail("Fail to get data")
+                return
+            }
+            expect(fResult.isSucceed).to(beTrue())
+        }
+        it("should use last completion") {
+            let randomNumber: Int = .random(in: 30..<40)
+            var secondResult: URLResult?
+            let request = Ness(onDuplicated: .keepLatestCompletion)
+                .httpRequest(.get, withUrl: "https://jsonplaceholder.typicode.com/todos/\(randomNumber)")
+                .prepareDataRequest()
+            waitUntil(timeout: 15) { done in
+                request.then { _ in
+                    fail("This completion should not be executed")
+                    done()
+                }
+                request.then { result in
+                    secondResult = result
+                    done()
+                }
+            }
+            guard let sResult = secondResult else {
+                fail("Fail to get data")
+                return
+            }
+            expect(sResult.isSucceed).to(beTrue())
+        }
+        it("should get json data") {
+            let randomNumber: Int = .random(in: 40..<50)
             var requestResult: URLResult?
             waitUntil(timeout: 15) { done in
                 Ness.default
@@ -23,12 +119,12 @@ class IntegratedTestSpec: QuickSpec {
                     .then { result in
                         requestResult = result
                         done()
-                }
+                    }
             }
             guard let result = requestResult,
-                let message = result.httpMessage else {
-                    fail("Fail to get data")
-                    return
+                  let message = result.httpMessage else {
+                fail("Fail to get data")
+                return
             }
             expect(result.error).to(beNil())
             expect(message.isHaveBody).to(beTrue())
@@ -39,7 +135,7 @@ class IntegratedTestSpec: QuickSpec {
                 fail("Fail to parse data")
                 return
             }
-            expect(json["userId"] as? Int).to(equal(1))
+            expect(json["userId"] as? Int).to(beGreaterThan(0))
             expect(json["id"] as? Int).to(equal(randomNumber))
             expect(json.keys.contains("title")).to(beTrue())
             expect(json.keys.contains("completed")).to(beTrue())
@@ -48,7 +144,7 @@ class IntegratedTestSpec: QuickSpec {
                 fail("Fail to parse data")
                 return
             }
-            expect(obj.userId).to(equal(1))
+            expect(obj.userId).to(beGreaterThan(0))
             expect(obj.id).to(equal(randomNumber))
             expect(obj.body).to(beNil())
             expect(obj.title.isEmpty).toNot(beTrue())
@@ -62,12 +158,12 @@ class IntegratedTestSpec: QuickSpec {
                     .then { result in
                         requestResult = result
                         done()
-                }
+                    }
             }
             guard let result = requestResult,
-                let message = result.httpMessage else {
-                    fail("Fail to get data")
-                    return
+                  let message = result.httpMessage else {
+                fail("Fail to get data")
+                return
             }
             expect(result.error).to(beNil())
             expect(message.isHaveBody).to(beTrue())
@@ -107,12 +203,12 @@ class IntegratedTestSpec: QuickSpec {
                     .then { result in
                         requestResult = result
                         done()
-                }
+                    }
             }
             guard let result = requestResult,
-                let message = result.httpMessage else {
-                    fail("Fail to get data")
-                    return
+                  let message = result.httpMessage else {
+                fail("Fail to get data")
+                return
             }
             expect(result.error).to(beNil())
             expect(message.isHaveBody).to(beTrue())
@@ -147,4 +243,3 @@ struct JSONPlaceholder: Codable {
     var userId: Int?
     var completed: Bool? = nil
 }
-

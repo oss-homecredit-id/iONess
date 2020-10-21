@@ -37,10 +37,10 @@ open class ErrorRequestPromise<Response: URLResponse, Result: NetworkResult>: UR
 
 open class HTTPRequestPromise<Response: URLResponse, Result: NetworkResult>: URLRequestPromise<Response, Result> {
     var urlRequest: URLRequest
-    var urlSession: URLSession
+    var networkSessionManager: NetworkSessionManager
     var retryControl: RetryControl?
     
-    public init(request: HTTPRequestMessage, with session: URLSession, retryControl: RetryControl?) throws {
+    public init(request: HTTPRequestMessage, with networkSessionManager: NetworkSessionManager, retryControl: RetryControl?) throws {
         let mutableRequest = try request.getFullUrl().asMutableRequest()
         for header in request.headers {
             mutableRequest.addValue(header.value, forHTTPHeaderField: header.key)
@@ -54,7 +54,7 @@ open class HTTPRequestPromise<Response: URLResponse, Result: NetworkResult>: URL
             mutableRequest.httpMethod = method
         }
         self.urlRequest = mutableRequest as URLRequest
-        self.urlSession = session
+        self.networkSessionManager = networkSessionManager
         self.retryControl = retryControl
     }
 }
