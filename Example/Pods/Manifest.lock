@@ -1,0 +1,27 @@
+PODS:
+  - iONess (0.1.0)
+  - Nimble (7.3.4)
+  - Quick (1.2.0)
+
+DEPENDENCIES:
+  - iONess (from `../`)
+  - Nimble (~> 7.0)
+  - Quick (~> 1.2.0)
+
+SPEC REPOS:
+  trunk:
+    - Nimble
+    - Quick
+
+EXTERNAL SOURCES:
+  iONess:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  iONess: ec0f857e3c20fbc10e6b5a805bc9f9c4ac7a0e0a
+  Nimble: 051e3d8912d40138fa5591c78594f95fb172af37
+  Quick: 58d203b1c5e27fff7229c4c1ae445ad7069a7a08
+
+PODFILE CHECKSUM: 3b5c23e7f0799d3808b35d845bac59a57d70e2a5
+
+COCOAPODS: 1.10.0.rc.1
