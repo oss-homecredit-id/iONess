@@ -13,7 +13,7 @@ open class DataRequestPromise<Response: URLResponse>: HTTPRequestPromise<Respons
     open override func then(run closure: @escaping (URLResult) -> Void) -> DropableURLRequest<Response> {
         let dispatcher = self.dispatcher
         return DropableDataRequest(
-            session: urlSession,
+            networkSessionManager: networkSessionManager,
             request: urlRequest,
             retryControl: retryControl,
             urlValidator: urlValidator) { result in

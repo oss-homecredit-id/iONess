@@ -15,7 +15,7 @@ open class DropableURLRequest<Response: URLResponse>: Dropable {
 open class BaseDropableURLRequest<Response: URLResponse, Result>: DropableURLRequest<Response> {
     let urlValidator: URLValidator?
     let retryControl: RetryControl?
-    let session: URLSession
+    let networkSessionManager: NetworkSessionManager
     let request: URLRequest
     let completion: (Result) -> Void
     
@@ -27,12 +27,12 @@ open class BaseDropableURLRequest<Response: URLResponse, Result>: DropableURLReq
     }
     
     public init(
-        session: URLSession,
+        networkSessionManager: NetworkSessionManager,
         request: URLRequest,
         urlValidator: URLValidator?,
         retryControl: RetryControl?,
         completion: @escaping (Result) -> Void) {
-        self.session = session
+        self.networkSessionManager = networkSessionManager
         self.request = request
         self.urlValidator = urlValidator
         self.retryControl = retryControl
@@ -62,7 +62,7 @@ extension BaseDropableURLRequest {
         error: Error,
         request: URLRequest,
         _ response: URLResponse?,
-        _ onRetry: @escaping () -> Void) {
+        _ onRetry: @escaping () -> Void) -> Bool {
         let retryStatus = retryControl?.shouldRetryWithTimeInterval(
             for: request,
             response: response,
@@ -71,12 +71,12 @@ extension BaseDropableURLRequest {
         switch retryStatus ?? .noRetry {
         case .retryAfter(let delay):
             DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: onRetry)
-            return
+            return true
         case .retry:
             onRetry()
-            return
+            return true
         case .noRetry:
-            break
+            return false
         }
     }
 }

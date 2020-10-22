@@ -35,7 +35,7 @@ iONess is available under the MIT license. See the LICENSE file for more info.
 
 ### Basic Usage
 
-iONess is designed to simplify the request process for HTTP Request. All you need to do is just create the request using Ness / HTTPRequestManager class:
+`iONess` is designed to simplify the request process for HTTP Request. All you need to do is just create the request using `Ness` /  `NetworkSessionManager` class:
 
 ```swift
 Ness.default
@@ -69,10 +69,10 @@ session.delegateQueue = myOperationQueue
 ..
 
 // create Ness instance
-let eatr = Ness(with: session)
+let ness = Ness(with: session)
 
 // create request
-eatr.httpRequest(.get, withUrl: "https://myurl.com")
+ness.httpRequest(.get, withUrl: "https://myurl.com")
     .set(urlParameters: ["param1": "value1", "param2": "value2"])
     .set(headers: ["Authorization": myToken])
     .set(body: dataBody)
@@ -408,6 +408,99 @@ public protocol HTTPValidator: URLValidator {
 
 Remember you can put as many validator as you want, which will validate the response using all those validator from the first until end or when one validator return `invalid`
 If you don't provide any `URLValidator`, then it will considered invalid if there's error or no response from the server, otherwise, all the response will be considered valid
+
+### RetryControl
+
+You can control when to retry if your request is failed using `RetryControl` protocol:
+
+```swift
+public protocol RetryControl {
+    func shouldRetryWithTimeInterval(for request: URLRequest, response: URLResponse?, error: Error) -> RetryControlDecision
+}
+```
+
+The method will run on failure request. The only thing you need to do is return the `RetryControlDecision` which is enumeration with members:
+- `noRetry` which will automatically fail the request
+- `retryAfter(TimeInterval)` which will retry the same request after `TimeInterval`
+- `retry` which will retry the same request immediately
+
+You can assign `RetryControl` when preparing request:
+
+```swift
+Ness.default
+    .httpRequest(.get, withUrl: "https://myurl.com")
+    ..
+    ..
+    .prepareDataRequest(with: myRetryControl)
+```
+It can be applicable for download or upload request too.
+
+iONess have some default `RetryControl` which is `CounterRetryControl` that the basic algorithm is just counting the failure time and stop retry when the counter reach the maxCount. to use it, just init the CounterRetryControl when prepare with your own maxCount or optionally with TimeInterval before retry. Example, if you want to auto retry maximum 3 times with delay 1 second for every retry:
+
+```swift
+Ness.default
+    .httpRequest(.get, withUrl: "https://myurl.com")
+    ..
+    ..
+    .prepareDataRequest(
+        with: CounterRetryControl(maxRetryCount: 3, 
+        timeIntervalBeforeTryToRetry: 1)
+    )
+```
+
+### DuplicatedHandler
+
+You can handle what to do if there are multiple duplicated request happen with `DuplicatedHandler`:
+
+```swift
+public protocol DuplicatedHandler {
+    func duplicatedDownload(request: URLRequest, withPreviousCompletion previousCompletion: @escaping URLCompletion<URL>, currentCompletion: @escaping URLCompletion<URL>) -> RequestDuplicatedDecision<URL>
+    func duplicatedUpload(request: URLRequest, withPreviousCompletion previousCompletion: @escaping URLCompletion<Data>, currentCompletion: @escaping URLCompletion<Data>) -> RequestDuplicatedDecision<Data>
+    func duplicatedData(request: URLRequest, withPreviousCompletion previousCompletion: @escaping URLCompletion<Data>, currentCompletion: @escaping URLCompletion<Data>) -> RequestDuplicatedDecision<Data>
+}
+```
+
+It will ask for `RequestDuplicatedDecision` depending on what type of duplicated request. The `RequestDuplicatedDecision` are enumeration with members:
+- `dropAndRequestAgain` which will drop previous request and do new request with current completion
+- `dropAndRequestAgainWithCompletion((Param?, URLResponse?, Error?) -> Void)` which will drop previous request and do new request with custom completion
+- `ignoreCurrentCompletion` which will ignore the current completion, so when the request is complete, it will just run the first request completion
+- `useCurrentCompletion` which will ignore the previous completion, so when the request is complete, it will just run the lastest request completion
+- `useBothCompletion` which will keep the previous completion, so when the request is complete, it will just run the all the request completion
+- `useCompletion((Param?, URLResponse?, Error?) -> Void)` which will ignore all completion and use the custom one
+
+The duplicatedHandler are stick to the `Ness` \ `NetworkSessionManager`, so if you have duplicated request with different `Ness` \ `NetworkSessionManager`, it should not be called.
+
+To assign `RequestDuplicatedDecision`, you can just assign it to `duplicatedHandler` property, or just add it when init:
+
+```swift
+// just handler
+let ness = Ness(duplicatedHandler: myHandler)
+
+// with session
+let ness = Ness(session: mySession, duplicatedHandler: myHandler)
+
+// using property
+ness.duplicatedHandler = myHandler
+```
+
+Or you can just use some default handler:
+
+```swift
+// just handler
+let ness = Ness(onDuplicated: .keepAllCompletion)
+
+// with session
+let ness = Ness(session: mySession, onDuplicated: .keepFirstCompletion)
+
+// using property
+ness.duplicatedHandler = DefaultDuplicatedHandler.keepLatestCompletion
+```
+
+There are 4 `DefaultDuplicatedHandler`: 
+- `dropPreviousRequest` which will drop previous request and do new request with current completion
+- `keepAllCompletion` which will keep the previous completion, so when the request is complete, it will just run the all the request completion
+- `keepFirstCompletion` which will ignore the current completion, so when the request is complete, it will just run the first request completion
+- `keepLatestCompletion` which will ignore the previous completion, so when the request is complete, it will just run the lastest request completion
 
 ### Aggregate
 

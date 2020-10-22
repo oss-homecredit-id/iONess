@@ -9,10 +9,10 @@ import Foundation
 
 open class URLRequestBuilder {
     private var httpRequest: HTTPRequestMessage
-    var session: URLSession
+    var networkSessionManager: NetworkSessionManager
     
-    init(method: HTTPRequestMessage.Method = .none, with url: URLCompatible, session: URLSession) {
-        self.session = session
+    init(method: HTTPRequestMessage.Method = .none, with url: URLCompatible, networkSessionManager: NetworkSessionManager) {
+        self.networkSessionManager = networkSessionManager
         httpRequest = .init()
         httpRequest.url = url
         httpRequest.method = method
@@ -84,19 +84,19 @@ open class URLRequestBuilder {
     
     open func prepareDataRequest(with retryControl: RetryControl? = nil) -> URLRequestPromise<HTTPURLResponse, URLResult> {
         tryGetRequest(
-            try DataRequestPromise(request: httpRequest, with: session, retryControl: retryControl)
+            try DataRequestPromise(request: httpRequest, with: networkSessionManager, retryControl: retryControl)
         )
     }
     
     open func prepareDownloadRequest(targetSavedLocation url: URL, with retryControl: RetryControl? = nil) -> URLRequestPromise<URLResponse, DownloadResult> {
         tryGetRequest(
-            try DownloadRequestPromise(request: httpRequest, with: session, retryControl: retryControl, targetUrl: url)
+            try DownloadRequestPromise(request: httpRequest, with: networkSessionManager, retryControl: retryControl, targetUrl: url)
         )
     }
     
     open func prepareUploadRequest(withFileLocation url: URL, with retryControl: RetryControl? = nil) -> URLRequestPromise<URLResponse, URLResult> {
         return tryGetRequest(
-            try UploadRequestPromise(request: httpRequest, with: session, retryControl: retryControl, fileURL: url)
+            try UploadRequestPromise(request: httpRequest, with: networkSessionManager, retryControl: retryControl, fileURL: url)
         )
     }
     

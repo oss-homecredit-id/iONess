@@ -10,15 +10,7 @@ import Foundation
 public class ResumableDownloadRequest: BaseDropableURLRequest<URLResponse, DownloadResult>, Resumable {
     let targetUrl: URL
     var dataInProgress: Data?
-    lazy var task: URLSessionDownloadTask = Self.download(
-        for: self,
-        in: session,
-        with: request,
-        targetUrl: targetUrl,
-        retryControl,
-        urlValidator,
-        completion
-    )
+    var task: URLSessionDownloadTask!
     
     public override var status: DropableStatus<Response> {
         switch task.state {
@@ -39,7 +31,7 @@ public class ResumableDownloadRequest: BaseDropableURLRequest<URLResponse, Downl
         }
     }
     
-    init(session: URLSession,
+    init(networkSessionManager: NetworkSessionManager,
          request: URLRequest,
          targetUrl: URL,
          retryControl: RetryControl?,
@@ -47,13 +39,22 @@ public class ResumableDownloadRequest: BaseDropableURLRequest<URLResponse, Downl
          completion: @escaping (DownloadResult) -> Void) {
         self.targetUrl = targetUrl
         super.init(
-            session: session,
+            networkSessionManager: networkSessionManager,
             request: request,
             urlValidator: urlValidator,
             retryControl: retryControl,
             completion: completion
         )
-        task.resume()
+        task = Self.download(
+            for: self,
+            resumeData: nil,
+            in: networkSessionManager,
+            with: request,
+            targetUrl: targetUrl,
+            retryControl,
+            urlValidator,
+            completion
+        )
     }
     
     public override func drop() {
@@ -73,27 +74,27 @@ public class ResumableDownloadRequest: BaseDropableURLRequest<URLResponse, Downl
         task = Self.download(
             for: self,
             resumeData: data,
-            in: session,
+            in: networkSessionManager,
             with: request,
             targetUrl: targetUrl,
             retryControl,
             urlValidator,
             completion
         )
-        task.resume()
         return .resumed
     }
     
     static func download(
         for dropable: ResumableDownloadRequest?,
         resumeData: Data? = nil,
-        in session: URLSession,
+        in networkSessionManager: NetworkSessionManager,
         with request: URLRequest,
         targetUrl: URL,
         _ retryControl: RetryControl?,
         _ validator: URLValidator?,
         _ completion: @escaping (DownloadResult) -> Void) -> URLSessionDownloadTask {
         let downloadCompletion: (URL?, URLResponse?, Error?) -> Void = { [weak dropable] url, response, error in
+            var shouldRunCompletion: Bool = true
             var currentError: Error?
             do {
                 if let downloadError = error {
@@ -110,10 +111,10 @@ public class ResumableDownloadRequest: BaseDropableURLRequest<URLResponse, Downl
                 currentError = error
             }
             if let currentError = currentError ?? validate(response: response, with: validator) {
-                retryIfShould(with: retryControl, error: currentError, request: request, response) {
+                let retried = retryIfShould(with: retryControl, error: currentError, request: request, response) {
                     dropable?.task = Self.download(
                         for: dropable,
-                        in: session,
+                        in: networkSessionManager,
                         with: request,
                         targetUrl: targetUrl,
                         retryControl,
@@ -121,8 +122,9 @@ public class ResumableDownloadRequest: BaseDropableURLRequest<URLResponse, Downl
                         completion
                     )
                 }
-                return
+                shouldRunCompletion = !retried
             }
+            guard shouldRunCompletion else { return }
             completion(
                 .init(
                     response: response,
@@ -132,8 +134,8 @@ public class ResumableDownloadRequest: BaseDropableURLRequest<URLResponse, Downl
             )
         }
         guard let data = resumeData else {
-            return session.downloadTask(with: request, completionHandler: downloadCompletion)
+            return networkSessionManager.downloadTask(with: request, completionHandler: downloadCompletion)
         }
-        return session.downloadTask(withResumeData: data, completionHandler: downloadCompletion)
+        return networkSessionManager.session.downloadTask(withResumeData: data, completionHandler: downloadCompletion)
     }
 }
