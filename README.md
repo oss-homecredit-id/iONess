@@ -2,7 +2,7 @@
 
 iONess (iOS Network Session) is HTTP Request Helper for iOS platform used by Home Credit Indonesia iOS App
 
-[![CI Status](https://img.shields.io/travis/nayanda/iONess.svg?style=flat)](https://travis-ci.org/nayanda/iONess)
+![build](https://github.com/oss-homecredit-id/iONess/workflows/build/badge.svg)
 [![Version](https://img.shields.io/cocoapods/v/iONess.svg?style=flat)](https://cocoapods.org/pods/iONess)
 [![License](https://img.shields.io/cocoapods/l/iONess.svg?style=flat)](https://cocoapods.org/pods/iONess)
 [![Platform](https://img.shields.io/cocoapods/p/iONess.svg?style=flat)](https://cocoapods.org/pods/iONess)
