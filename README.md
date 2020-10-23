@@ -302,7 +302,7 @@ public protocol ResponseDecoder {
 
 so you can do something like this: 
 
-```swif
+```swift
 class MyResponseDecoder: ResponseDecoder {
     typealias Decoded = MyObject
     
@@ -314,7 +314,7 @@ class MyResponseDecoder: ResponseDecoder {
 
 there are default base decoder you can use if you don't want to parse from `Data`
 
-```swif
+```swift
 class MyJSONResponseDecoder: BaseJSONDecoder<MyObject> {
     typealias Decoded = MyObject
     
