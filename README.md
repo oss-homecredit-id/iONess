@@ -409,6 +409,20 @@ public protocol HTTPValidator: URLValidator {
 Remember you can put as many validator as you want, which will validate the response using all those validator from the first until end or when one validator return `invalid`
 If you don't provide any `URLValidator`, then it will considered invalid if there's error or no response from the server, otherwise, all the response will be considered valid
 
+### NetworkSessionDelegate
+
+You can manipulate request or action globally in Session level by using `NetworkSessionDelegate`:
+
+```swift
+public protocol NetworkSessionManagerDelegate: class {
+    func ness(_ manager: Ness, willRequest request: URLRequest) -> URLRequest
+    func ness(_ manager: Ness, didRequest request: URLRequest) -> Void
+}
+```
+both method are optional. The methods will run and functional for:
+- `ness(_: , willRequest: )` will run before any request executed. You can manipulate `URLRequest` object here and return it or doing anything prior to request and return the current `URLRequest`
+- `ness(_: , didRequest: )` will run after any request is executed, but not after the request is finished.
+
 ### RetryControl
 
 You can control when to retry if your request is failed using `RetryControl` protocol:
