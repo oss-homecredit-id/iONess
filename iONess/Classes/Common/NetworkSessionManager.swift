@@ -16,6 +16,7 @@ open class NetworkSessionManager {
     public var duplicatedHandler: DuplicatedHandler
     let lock = NSLock()
     var completions: [NetworkRequest: URLCompletion<Any>] = [:]
+    weak var delegate: NetworkSessionManagerDelegate?
     
     public init(
         with session: URLSession = .shared,
@@ -38,4 +39,16 @@ open class NetworkSessionManager {
     public func dropAllRequest() {
         session.invalidateAndCancel()
     }
+}
+
+public typealias NessDelegate = NetworkSessionManagerDelegate
+
+public protocol NetworkSessionManagerDelegate: class {
+    func ness(_ manager: Ness, willRequest request: URLRequest) -> URLRequest
+    func ness(_ manager: Ness, didRequest request: URLRequest) -> Void
+}
+
+public extension NetworkSessionManagerDelegate {
+    func ness(_ manager: Ness, willRequest request: URLRequest) -> URLRequest { request }
+    func ness(_ manager: Ness, didRequest request: URLRequest) -> Void { }
 }

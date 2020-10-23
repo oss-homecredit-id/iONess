@@ -9,7 +9,7 @@ import Foundation
 
 public typealias URLCompletion<Param> = (Param?, URLResponse?, Error?) -> Void
 
-public extension NetworkSessionManager {
+extension NetworkSessionManager {
     
     func task(for request: URLRequest) -> URLSessionTask? {
         lockedRun {
@@ -78,6 +78,10 @@ public extension NetworkSessionManager {
     }
     
     func downloadTask(with request: URLRequest, completionHandler: @escaping URLCompletion<URL>) -> URLSessionDownloadTask {
+        let request = delegate?.ness(self, willRequest: request) ?? request
+        defer {
+            delegate?.ness(self, didRequest: request)
+        }
         var completion: URLCompletion<URL> = completionHandler
         if let prevCompletion: URLCompletion<URL> = currentCompletion(for: request) {
             let decision = duplicatedHandler.duplicatedDownload(
@@ -105,6 +109,10 @@ public extension NetworkSessionManager {
     }
     
     func uploadTask(with request: URLRequest, fromFile fileURL: URL, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionUploadTask {
+        let request = delegate?.ness(self, willRequest: request) ?? request
+        defer {
+            delegate?.ness(self, didRequest: request)
+        }
         var completion: URLCompletion<Data> = completionHandler
         if let prevCompletion: URLCompletion<Data> = currentCompletion(for: request) {
             let decision = duplicatedHandler.duplicatedUpload(
@@ -132,6 +140,10 @@ public extension NetworkSessionManager {
     }
     
     func dataTask(with request: URLRequest, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask {
+        let request = delegate?.ness(self, willRequest: request) ?? request
+        defer {
+            delegate?.ness(self, didRequest: request)
+        }
         var completion: URLCompletion<Data> = completionHandler
         if let prevCompletion: URLCompletion<Data> = currentCompletion(for: request) {
             let decision = duplicatedHandler.duplicatedData(
