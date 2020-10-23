@@ -409,9 +409,9 @@ public protocol HTTPValidator: URLValidator {
 Remember you can put as many validator as you want, which will validate the response using all those validator from the first until end or when one validator return `invalid`
 If you don't provide any `URLValidator`, then it will considered invalid if there's error or no response from the server, otherwise, all the response will be considered valid
 
-### NetworkSessionDelegate
+### NetworkSessionManagerDelegate
 
-You can manipulate request or action globally in Session level by using `NetworkSessionDelegate`:
+You can manipulate request or action globally in Session level by using `NetworkSessionManagerDelegate`:
 
 ```swift
 public protocol NetworkSessionManagerDelegate: class {
