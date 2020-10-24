@@ -13,10 +13,10 @@ open class NetworkSessionManager {
     public static var `default`: NetworkSessionManager = .init()
     
     public private(set) var session: URLSession
+    public weak var delegate: NetworkSessionManagerDelegate?
     public var duplicatedHandler: DuplicatedHandler
     let lock = NSLock()
     var completions: [NetworkRequest: URLCompletion<Any>] = [:]
-    weak var delegate: NetworkSessionManagerDelegate?
     
     public init(
         with session: URLSession = .shared,
