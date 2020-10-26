@@ -62,9 +62,21 @@ public class DropableDataRequest<Response: URLResponse>: BaseDropableURLRequest<
         _ validator: URLValidator?,
         _ completion: @escaping (URLResult) -> Void) -> URLSessionDataTask {
         networkSessionManager.dataTask(with: request) { [weak dropable] data, response, error in
-            var shouldRunCompletion: Bool = true
-            if let requestError = error ?? validate(response: response, with: validator) {
-                let retried = retryIfShould(with: retryControl, error: requestError, request: request, response) {
+            guard let requestError = error ?? validate(response: response, with: validator) else {
+                completion(
+                    .init(
+                        response: response,
+                        data: data,
+                        error: error
+                    )
+                )
+                return
+            }
+            retryIfShould(
+                with: retryControl,
+                error: requestError,
+                request: request,
+                response, {
                     dropable?.task = Self.request(
                         for: dropable,
                         in: networkSessionManager,
@@ -73,16 +85,15 @@ public class DropableDataRequest<Response: URLResponse>: BaseDropableURLRequest<
                         validator,
                         completion
                     )
+                }, onNoRetry: {
+                    completion(
+                        .init(
+                            response: response,
+                            data: data,
+                            error: error
+                        )
+                    )
                 }
-                shouldRunCompletion = !retried
-            }
-            guard shouldRunCompletion else { return }
-            completion(
-                .init(
-                    response: response,
-                    data: data,
-                    error: error
-                )
             )
         }
     }

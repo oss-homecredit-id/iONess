@@ -84,6 +84,24 @@ public class ResumableDownloadRequest: BaseDropableURLRequest<URLResponse, Downl
         return .resumed
     }
     
+    static func moveResult(into targetUrl: URL, from url: URL?, currentError: Error?, response: URLResponse?) -> Error? {
+        do {
+            if let downloadError = currentError {
+                throw downloadError
+            }
+            guard let url = url else {
+                throw NetworkSessionError(
+                    statusCode: (response as? HTTPURLResponse)?.statusCode ?? -1,
+                    description: "iONess Error: data failed to download"
+                )
+            }
+            try FileManager.default.moveItem(at: url, to: targetUrl)
+            return nil
+        } catch {
+           return error
+        }
+    }
+    
     static func download(
         for dropable: ResumableDownloadRequest?,
         resumeData: Data? = nil,
@@ -94,24 +112,21 @@ public class ResumableDownloadRequest: BaseDropableURLRequest<URLResponse, Downl
         _ validator: URLValidator?,
         _ completion: @escaping (DownloadResult) -> Void) -> URLSessionDownloadTask {
         let downloadCompletion: (URL?, URLResponse?, Error?) -> Void = { [weak dropable] url, response, error in
-            var shouldRunCompletion: Bool = true
-            var currentError: Error?
-            do {
-                if let downloadError = error {
-                    throw downloadError
-                }
-                guard let url = url else {
-                    throw NetworkSessionError(
-                        statusCode: (response as? HTTPURLResponse)?.statusCode ?? -1,
-                        description: "iONess Error: data failed to download"
+            guard let errorAfterValidate = moveResult(into: targetUrl, from: url, currentError: error, response: response) ?? validate(response: response, with: validator) else {
+                completion(
+                    .init(
+                        response: response,
+                        dataLocalURL: targetUrl,
+                        error: error
                     )
-                }
-                try FileManager.default.moveItem(at: url, to: targetUrl)
-            } catch {
-                currentError = error
+                )
+                return
             }
-            if let currentError = currentError ?? validate(response: response, with: validator) {
-                let retried = retryIfShould(with: retryControl, error: currentError, request: request, response) {
+            retryIfShould(
+                with: retryControl,
+                error: errorAfterValidate,
+                request: request,
+                response, {
                     dropable?.task = Self.download(
                         for: dropable,
                         in: networkSessionManager,
@@ -121,16 +136,15 @@ public class ResumableDownloadRequest: BaseDropableURLRequest<URLResponse, Downl
                         validator,
                         completion
                     )
+                }, onNoRetry: {
+                    completion(
+                        .init(
+                            response: response,
+                            dataLocalURL: targetUrl,
+                            error: error
+                        )
+                    )
                 }
-                shouldRunCompletion = !retried
-            }
-            guard shouldRunCompletion else { return }
-            completion(
-                .init(
-                    response: response,
-                    dataLocalURL: targetUrl,
-                    error: currentError
-                )
             )
         }
         guard let data = resumeData else {
