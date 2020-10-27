@@ -8,7 +8,7 @@
 import Foundation
 
 public protocol RetryControl {
-    func shouldRetry(for request: URLRequest, response: URLResponse?, error: Error, didHaveDecision: (RetryControlDecision) -> Void) -> Void
+    func shouldRetry(for request: URLRequest, response: URLResponse?, error: Error, didHaveDecision: @escaping (RetryControlDecision) -> Void) -> Void
 }
 
 public class CounterRetryControl: RetryControl, LockRunner {
@@ -23,7 +23,7 @@ public class CounterRetryControl: RetryControl, LockRunner {
     let lock: NSLock = .init()
     var retriedRequests: [URLRequest: Int] = [:]
     
-    public func shouldRetry(for request: URLRequest, response: URLResponse?, error: Error, didHaveDecision: (RetryControlDecision) -> Void) {
+    public func shouldRetry(for request: URLRequest, response: URLResponse?, error: Error, didHaveDecision: @escaping (RetryControlDecision) -> Void) {
         lockedRun {
             let counter = retriedRequests[request] ?? 0
             guard counter < maxRetryCount else {
