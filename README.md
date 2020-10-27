@@ -429,11 +429,15 @@ You can control when to retry if your request is failed using `RetryControl` pro
 
 ```swift
 public protocol RetryControl {
-    func shouldRetryWithTimeInterval(for request: URLRequest, response: URLResponse?, error: Error) -> RetryControlDecision
+func shouldRetry(
+    for request: URLRequest, 
+    response: URLResponse?, 
+    error: Error, 
+    didHaveDecision: (RetryControlDecision) -> Void) -> Void
 }
 ```
 
-The method will run on failure request. The only thing you need to do is return the `RetryControlDecision` which is enumeration with members:
+The method will run on failure request. The only thing you need to do is passing the `RetryControlDecision` into `didHaveDecision` closure which is enumeration with members:
 - `noRetry` which will automatically fail the request
 - `retryAfter(TimeInterval)` which will retry the same request after `TimeInterval`
 - `retry` which will retry the same request immediately
@@ -457,8 +461,10 @@ Ness.default
     ..
     ..
     .prepareDataRequest(
-        with: CounterRetryControl(maxRetryCount: 3, 
-        timeIntervalBeforeTryToRetry: 1)
+        with: CounterRetryControl(
+            maxRetryCount: 3, 
+            timeIntervalBeforeTryToRetry: 1
+        )
     )
 ```
 

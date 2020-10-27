@@ -90,3 +90,4 @@ fastlane/test_output
 iOSInjectionProject/
 .github/.DS_Store
 .github/workflows/.DS_Store
+.DS_Store

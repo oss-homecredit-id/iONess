@@ -62,21 +62,25 @@ extension BaseDropableURLRequest {
         error: Error,
         request: URLRequest,
         _ response: URLResponse?,
-        _ onRetry: @escaping () -> Void) -> Bool {
-        let retryStatus = retryControl?.shouldRetryWithTimeInterval(
+        _ onRetry: @escaping () -> Void,
+        onNoRetry: @escaping () -> Void) -> Void {
+        guard let retryControl = retryControl else {
+            onNoRetry()
+            return
+        }
+        retryControl.shouldRetry(
             for: request,
             response: response,
             error: error
-        )
-        switch retryStatus ?? .noRetry {
-        case .retryAfter(let delay):
-            DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: onRetry)
-            return true
-        case .retry:
-            onRetry()
-            return true
-        case .noRetry:
-            return false
+        ) { retryStatus in
+            switch retryStatus {
+            case .retryAfter(let delay):
+                DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: onRetry)
+            case .retry:
+                onRetry()
+            case .noRetry:
+                onNoRetry()
+            }
         }
     }
 }
