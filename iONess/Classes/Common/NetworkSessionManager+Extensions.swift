@@ -26,7 +26,9 @@ extension NetworkSessionManager: LockRunner {
             biConsumer.value(
                 nil,
                 nil,
-                NetworkSessionError(description: "iONess Error: Cancelled by NetworkSessionManager")
+                NetworkSessionError(
+                    description: "iONess Error: Cancelled by NetworkSessionManager"
+                )
             )
         }
     }
@@ -70,94 +72,94 @@ extension NetworkSessionManager: LockRunner {
     }
     
     func downloadTask(with request: URLRequest, completionHandler: @escaping URLCompletion<URL>) -> URLSessionDownloadTask {
-        let request = delegate?.ness(self, willRequest: request) ?? request
+        let updatedRequest = delegate?.ness(self, willRequest: request) ?? request
         defer {
-            delegate?.ness(self, didRequest: request)
+            delegate?.ness(self, didRequest: updatedRequest)
         }
         var completion: URLCompletion<URL> = completionHandler
-        if let prevCompletion: URLCompletion<URL> = currentCompletion(for: request) {
+        if let prevCompletion: URLCompletion<URL> = currentCompletion(for: updatedRequest) {
             let decision = duplicatedHandler.duplicatedDownload(
-                request: request,
+                request: updatedRequest,
                 withPreviousCompletion: prevCompletion,
                 currentCompletion: completionHandler
             )
-            completion = decide(from: decision, request, completionHandler, prevCompletion)
-            if let task = task(for: request) as? URLSessionDownloadTask {
-                assign(for: request, completion: completion)
+            completion = decide(from: decision, updatedRequest, completionHandler, prevCompletion)
+            if let task = task(for: updatedRequest) as? URLSessionDownloadTask {
+                assign(for: updatedRequest, completion: completion)
                 return task
             }
         }
-        let task = session.downloadTask(with: request) { [weak self] url, response, error in
+        let task = session.downloadTask(with: updatedRequest) { [weak self] url, response, error in
             guard let self = self else {
                 completion(url, response, error)
                 return
             }
-            let currentCompletion: URLCompletion<URL>? = self.removeAndGetCompletion(for: request)
+            let currentCompletion: URLCompletion<URL>? = self.removeAndGetCompletion(for: updatedRequest)
             currentCompletion?(url, response, error)
         }
-        assign(for: request, task: task, completion: completion)
+        assign(for: updatedRequest, task: task, completion: completion)
         task.resume()
         return task
     }
     
     func uploadTask(with request: URLRequest, fromFile fileURL: URL, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionUploadTask {
-        let request = delegate?.ness(self, willRequest: request) ?? request
+        let updatedRequest = delegate?.ness(self, willRequest: request) ?? request
         defer {
-            delegate?.ness(self, didRequest: request)
+            delegate?.ness(self, didRequest: updatedRequest)
         }
         var completion: URLCompletion<Data> = completionHandler
-        if let prevCompletion: URLCompletion<Data> = currentCompletion(for: request) {
+        if let prevCompletion: URLCompletion<Data> = currentCompletion(for: updatedRequest) {
             let decision = duplicatedHandler.duplicatedUpload(
-                request: request,
+                request: updatedRequest,
                 withPreviousCompletion: prevCompletion,
                 currentCompletion: completionHandler
             )
-            completion = decide(from: decision, request, completionHandler, prevCompletion)
-            if let task = task(for: request) as? URLSessionUploadTask {
-                assign(for: request, completion: completion)
+            completion = decide(from: decision, updatedRequest, completionHandler, prevCompletion)
+            if let task = task(for: updatedRequest) as? URLSessionUploadTask {
+                assign(for: updatedRequest, completion: completion)
                 return task
             }
         }
-        let task = session.uploadTask(with: request, fromFile: fileURL) { [weak self] data, response, error in
+        let task = session.uploadTask(with: updatedRequest, fromFile: fileURL) { [weak self] data, response, error in
             guard let self = self else {
                 completion(data, response, error)
                 return
             }
-            let currentCompletion: URLCompletion<Data>? = self.removeAndGetCompletion(for: request)
+            let currentCompletion: URLCompletion<Data>? = self.removeAndGetCompletion(for: updatedRequest)
             currentCompletion?(data, response, error)
         }
-        assign(for: request, task: task, completion: completion)
+        assign(for: updatedRequest, task: task, completion: completion)
         task.resume()
         return task
     }
     
     func dataTask(with request: URLRequest, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask {
-        let request = delegate?.ness(self, willRequest: request) ?? request
+        let updatedRequest = delegate?.ness(self, willRequest: request) ?? request
         defer {
-            delegate?.ness(self, didRequest: request)
+            delegate?.ness(self, didRequest: updatedRequest)
         }
         var completion: URLCompletion<Data> = completionHandler
-        if let prevCompletion: URLCompletion<Data> = currentCompletion(for: request) {
+        if let prevCompletion: URLCompletion<Data> = currentCompletion(for: updatedRequest) {
             let decision = duplicatedHandler.duplicatedData(
-                request: request,
+                request: updatedRequest,
                 withPreviousCompletion: prevCompletion,
                 currentCompletion: completionHandler
             )
-            completion = decide(from: decision, request, completionHandler, prevCompletion)
-            if let task = task(for: request) as? URLSessionDataTask {
-                assign(for: request, completion: completion)
+            completion = decide(from: decision, updatedRequest, completionHandler, prevCompletion)
+            if let task = task(for: updatedRequest) as? URLSessionDataTask {
+                assign(for: updatedRequest, completion: completion)
                 return task
             }
         }
-        let task = session.dataTask(with: request) { [weak self] data, response, error in
+        let task = session.dataTask(with: updatedRequest) { [weak self] data, response, error in
             guard let self = self else {
                 completion(data, response, error)
                 return
             }
-            let currentCompletion: URLCompletion<Data>? = self.removeAndGetCompletion(for: request)
+            let currentCompletion: URLCompletion<Data>? = self.removeAndGetCompletion(for: updatedRequest)
             currentCompletion?(data, response, error)
         }
-        assign(for: request, task: task, completion: completion)
+        assign(for: updatedRequest, task: task, completion: completion)
         task.resume()
         return task
     }
