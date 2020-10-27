@@ -55,13 +55,13 @@ public class DropableDataRequest<Response: URLResponse>: BaseDropableURLRequest<
     }
     
     static func request(
-        for dropable: DropableDataRequest?,
+        for dropable: DropableDataRequest,
         in networkSessionManager: NetworkSessionManager,
         with request: URLRequest,
         _ retryControl: RetryControl?,
         _ validator: URLValidator?,
         _ completion: @escaping (URLResult) -> Void) -> URLSessionDataTask {
-        networkSessionManager.dataTask(with: request) { [weak dropable] data, response, error in
+        networkSessionManager.dataTask(with: request) { data, response, error in
             guard let requestError = error ?? validate(response: response, with: validator) else {
                 completion(
                     .init(
@@ -77,7 +77,7 @@ public class DropableDataRequest<Response: URLResponse>: BaseDropableURLRequest<
                 error: requestError,
                 request: request,
                 response, {
-                    dropable?.task = Self.request(
+                    dropable.task = Self.request(
                         for: dropable,
                         in: networkSessionManager,
                         with: request,
