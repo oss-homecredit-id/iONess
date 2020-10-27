@@ -65,6 +65,6 @@ public extension URLThenableRequest {
 
 public extension URLThenableRequest {
     func aggregate(with request: Self) -> RequestAggregator<Self> {
-        return RequestAggregator(requests: []).aggregate(request)
+        RequestAggregator(requests: [self, request])
     }
 }
