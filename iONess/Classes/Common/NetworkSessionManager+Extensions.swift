@@ -9,7 +9,7 @@ import Foundation
 
 public typealias URLCompletion<Param> = (Param?, URLResponse?, Error?) -> Void
 
-extension NetworkSessionManager {
+extension NetworkSessionManager: LockRunner {
     
     func task(for request: URLRequest) -> URLSessionTask? {
         lockedRun {
@@ -67,14 +67,6 @@ extension NetworkSessionManager {
         lockedRun {
             completions.contains(where: { $0.key =~ request })
         }
-    }
-    
-    func lockedRun<Result>(_ runner: () -> Result) -> Result {
-        lock.lock()
-        defer {
-            lock.unlock()
-        }
-        return runner()
     }
     
     func downloadTask(with request: URLRequest, completionHandler: @escaping URLCompletion<URL>) -> URLSessionDownloadTask {

@@ -11,7 +11,7 @@ public protocol RetryControl {
     func shouldRetry(for request: URLRequest, response: URLResponse?, error: Error, didHaveDecision: (RetryControlDecision) -> Void) -> Void
 }
 
-public class CounterRetryControl: RetryControl {
+public class CounterRetryControl: RetryControl, LockRunner {
     
     var maxRetryCount: Int
     public var timeIntervalBeforeTryToRetry: TimeInterval?
@@ -20,26 +20,24 @@ public class CounterRetryControl: RetryControl {
         self.timeIntervalBeforeTryToRetry = timeIntervalBeforeTryToRetry
     }
     
-    var lock: NSLock = .init()
+    let lock: NSLock = .init()
     var retriedRequests: [URLRequest: Int] = [:]
     
     public func shouldRetry(for request: URLRequest, response: URLResponse?, error: Error, didHaveDecision: (RetryControlDecision) -> Void) {
-        lock.lock()
-        defer {
-            lock.lock()
+        lockedRun {
+            let counter = retriedRequests[request] ?? 0
+            guard counter < maxRetryCount else {
+                retriedRequests.removeValue(forKey: request)
+                didHaveDecision(.noRetry)
+                return
+            }
+            retriedRequests[request] = counter + 1
+            guard let timeInterval = timeIntervalBeforeTryToRetry else {
+                didHaveDecision(.retry)
+                return
+            }
+            didHaveDecision(.retryAfter(timeInterval))
         }
-        let counter = retriedRequests[request] ?? 0
-        guard counter < maxRetryCount else {
-            retriedRequests.removeValue(forKey: request)
-            didHaveDecision(.noRetry)
-            return
-        }
-        retriedRequests[request] = counter + 1
-        guard let timeInterval = timeIntervalBeforeTryToRetry else {
-            didHaveDecision(.retry)
-            return
-        }
-        didHaveDecision(.retryAfter(timeInterval))
     }
     
 }

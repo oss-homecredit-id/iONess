@@ -71,22 +71,19 @@ public class RequestAggregator<AggregatedThenable: URLThenableRequest>: Thenable
 
 extension RequestAggregator {
     
-    public class Results<AggregatedResult: NetworkResult> {
-        private let lock = NSLock()
+    public class Results<AggregatedResult: NetworkResult>: LockRunner {
+        let lock = NSLock()
         public var results: [AggregatedResult] = []
         public var isFailed: Bool {
-            lock.lock()
-            defer {
-                lock.unlock()
+            lockedRun {
+                results.contains { $0.error != nil }
             }
-            return results.contains { $0.error != nil }
         }
         public var areCompleted: Bool {
-            lock.lock()
-            defer {
-                lock.unlock()
+            lockedRun {
+                results.count == targetCompletedCount
+                    && !results.contains { $0.error != nil }
             }
-            return results.count == targetCompletedCount && !isFailed
         }
         var targetCompletedCount: Int
         
@@ -95,9 +92,9 @@ extension RequestAggregator {
         }
         
         func add(result: AggregatedResult) {
-            lock.lock()
-            results.append(result)
-            lock.unlock()
+            lockedRun {
+                results.append(result)
+            }
         }
     }
 }
@@ -145,31 +142,31 @@ extension DropableRequestAggregator {
         var responses: [AggregatedResponse] = []
     }
     
-    class RunningRequests {
-        private let lock = NSLock()
+    class RunningRequests: LockRunner {
+        let lock = NSLock()
         var runningRequests: [DropableURLRequest<AggregatedResponse>] = []
         var canceled: Bool = false
         var targetRunCount: Int
         var isAllRequestRun: Bool {
-            runningRequests.count == targetRunCount && !canceled
+            lockedRun {
+                runningRequests.count == targetRunCount && !canceled
+            }
         }
         var progress: Float {
-            lock.lock()
-            defer {
-                lock.unlock()
-            }
-            var total: Float = 0
-            for dropable in runningRequests {
-                switch dropable.status {
-                case .running(let progress):
-                    total += progress
-                case .completed(_):
-                    total += 1
-                default:
-                    break
+            lockedRun {
+                var total: Float = 0
+                for dropable in runningRequests {
+                    switch dropable.status {
+                    case .running(let progress):
+                        total += progress
+                    case .completed(_):
+                        total += 1
+                    default:
+                        break
+                    }
                 }
+                return total / Float(targetRunCount)
             }
-            return total / Float(targetRunCount)
         }
         
         init(targetRunCount: Int) {
@@ -185,17 +182,17 @@ extension DropableRequestAggregator {
                 dropable.drop()
                 return
             }
-            lock.lock()
-            runningRequests.append(dropable)
-            lock.unlock()
+            lockedRun {
+                runningRequests.append(dropable)
+            }
         }
         
         func cancel() {
-            lock.lock()
-            canceled = true
-            runningRequests.forEach { $0.drop() }
-            runningRequests.removeAll()
-            lock.unlock()
+            lockedRun {
+                canceled = true
+                runningRequests.forEach { $0.drop() }
+                runningRequests.removeAll()
+            }
         }
     }
 }
