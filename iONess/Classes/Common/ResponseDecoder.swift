@@ -86,12 +86,6 @@ open class BaseStringDecoder<ObjectType>: ResponseDecoder {
     }
 }
 
-public extension BaseJSONDecoder {
-    static var forArray: ArrayedJSONDecoder<JSONType> {
-        .init(singleDecoder: Self.init())
-    }
-}
-
 public struct ArrayedJSONDecoder<JSONType>: ResponseDecoder {
     public typealias Decoded = Array<JSONType>
     

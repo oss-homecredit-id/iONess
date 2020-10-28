@@ -263,11 +263,3 @@ class IntegratedTestSpec: QuickSpec {
         }
     }
 }
-
-struct JSONPlaceholder: Codable {
-    var id: Int = 0
-    var title: String
-    var body: String?
-    var userId: Int?
-    var completed: Bool? = nil
-}
