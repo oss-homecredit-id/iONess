@@ -29,7 +29,7 @@ public class DropableUploadRequest<Response: URLResponse>: BaseDropableURLReques
         }
     }
     
-    init(networkSessionManager: NetworkSessionManager,
+    public init(networkSessionManager: NetworkSessionManager,
          request: URLRequest,
          fileUrl: URL,
          retryControl: RetryControl?,

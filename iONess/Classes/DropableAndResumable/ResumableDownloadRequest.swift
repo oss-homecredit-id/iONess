@@ -31,7 +31,7 @@ public class ResumableDownloadRequest: BaseDropableURLRequest<URLResponse, Downl
         }
     }
     
-    init(networkSessionManager: NetworkSessionManager,
+    public init(networkSessionManager: NetworkSessionManager,
          request: URLRequest,
          targetUrl: URL,
          retryControl: RetryControl?,
