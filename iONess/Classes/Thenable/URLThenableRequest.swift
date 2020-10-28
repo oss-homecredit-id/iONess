@@ -36,29 +36,36 @@ public extension URLThenableRequest {
 
 public extension URLThenableRequest {
     
-    mutating func completionDispatch(on dispatcher: DispatchQueue) -> Self {
-        self.dispatcher = dispatcher
-        return self
+    @discardableResult
+    func completionDispatch(on dispatcher: DispatchQueue) -> Self {
+        var requestWithDispatch = self
+        requestWithDispatch.dispatcher = dispatcher
+        return requestWithDispatch
     }
     
-    mutating func validate(statusCode: Int) -> Self {
+    @discardableResult
+    func validate(statusCode: Int) -> Self {
         return validate(statusCodes: statusCode..<statusCode + 1)
     }
     
-    mutating func validate(statusCodes: Range<Int>) -> Self {
+    @discardableResult
+    func validate(statusCodes: Range<Int>) -> Self {
         validate(using: StatusCodeValidator(statusCodes))
     }
     
-    mutating func validate(shouldHaveHeaders headers: [String:String]) -> Self {
+    @discardableResult
+    func validate(shouldHaveHeaders headers: [String:String]) -> Self {
         validate(using: HeaderValidator(headers))
     }
     
-    mutating func validate(using validator: URLValidator) -> Self {
+    @discardableResult
+    func validate(using validator: URLValidator) -> Self {
+        var requestWithValidation = self
         guard let current = urlValidator else {
-            self.urlValidator = validator
+            requestWithValidation.urlValidator = validator
             return self
         }
-        self.urlValidator = current.combine(with: validator)
+        requestWithValidation.urlValidator = current.combine(with: validator)
         return self
     }
 }
