@@ -64,7 +64,8 @@ extension BaseDropableURLRequest {
         _ response: URLResponse?,
         _ onRetry: @escaping () -> Void,
         onNoRetry: @escaping () -> Void) -> Void {
-        guard let retryControl = retryControl else {
+        guard !error.causeByCancel,
+              let retryControl = retryControl else {
             onNoRetry()
             return
         }

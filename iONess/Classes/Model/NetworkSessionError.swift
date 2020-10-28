@@ -75,13 +75,18 @@ public class NetworkSessionError: NSError, NetworkSessionErrorProtocol {
     
     public var errorDescription: String? { localizedDescription }
     
-    init(originalError: Error? = nil, statusCode: Int = -1, description: String? = nil) {
+    init(originalError: Error? = nil, statusCode: Int? = nil, description: String? = nil) {
         self.originalError = originalError
-        let desc: String = description ?? (NetworkSessionError.statusCodeMesage[statusCode] ?? "Unknown Error")
-        super.init(domain: "homecredit.co.id.ioness", code: statusCode, userInfo: [NSLocalizedDescriptionKey: desc])
+        let code = (statusCode ?? (originalError as NSError?)?.code) ?? -1
+        let desc: String = description ?? (NetworkSessionError.statusCodeMesage[code] ?? "Unknown Error")
+        super.init(domain: "homecredit.co.id.ioness", code: code, userInfo: [NSLocalizedDescriptionKey: desc])
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+}
+
+public extension Error {
+    var causeByCancel: Bool { (self as NSError).code == NSURLErrorCancelled }
 }
