@@ -59,7 +59,7 @@ public class DropableUploadRequest<Response: URLResponse>: BaseDropableURLReques
     }
     
     static func upload(
-        for promise: DropableUploadRequest,
+        for dropable: DropableUploadRequest,
         in networkSessionManager: NetworkSessionManager,
         with request: URLRequest,
         fromFile url: URL,
@@ -82,8 +82,8 @@ public class DropableUploadRequest<Response: URLResponse>: BaseDropableURLReques
                 error: requestError,
                 request: request,
                 response, {
-                    promise.task = Self.upload(
-                        for: promise,
+                    dropable.task = Self.upload(
+                        for: dropable,
                         in: networkSessionManager,
                         with: request,
                         fromFile: url,

@@ -15,12 +15,23 @@ open class NetworkSessionManager {
     public private(set) var session: URLSession
     public weak var delegate: NetworkSessionManagerDelegate?
     public var duplicatedHandler: DuplicatedHandler
+    public var timeout: TimeInterval = 30 {
+        didSet {
+            session.configuration.timeoutIntervalForRequest = timeout
+            session.configuration.timeoutIntervalForResource = timeout
+        }
+    }
+    
     let lock = NSLock()
     var completions: [NetworkRequest: URLCompletion<Any>] = [:]
     
     public init(
         with session: URLSession = .shared,
         onDuplicated handler: DefaultDuplicatedHandler = .keepAllCompletion) {
+        self.timeout = max(
+            session.configuration.timeoutIntervalForResource,
+            session.configuration.timeoutIntervalForResource
+        )
         self.session = session
         self.duplicatedHandler = handler
     }

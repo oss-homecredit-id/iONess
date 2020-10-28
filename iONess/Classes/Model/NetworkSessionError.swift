@@ -15,6 +15,8 @@ public protocol NetworkSessionErrorProtocol: LocalizedError {
 public class NetworkSessionError: NSError, NetworkSessionErrorProtocol {
     
     public static let statusCodeMesage: [Int: String] = [
+        NSURLErrorCancelled: "Request Canceled",
+        NSURLErrorUnknown: "Unknown Error",
         203: "Non-Authoritative Information (since HTTP/1.1)",
         204: "No Content",
         205: "Reset Content",
@@ -75,13 +77,18 @@ public class NetworkSessionError: NSError, NetworkSessionErrorProtocol {
     
     public var errorDescription: String? { localizedDescription }
     
-    init(originalError: Error? = nil, statusCode: Int = -1, description: String? = nil) {
+    init(originalError: Error? = nil, statusCode: Int? = nil, description: String? = nil) {
         self.originalError = originalError
-        let desc: String = description ?? (NetworkSessionError.statusCodeMesage[statusCode] ?? "Unknown Error")
-        super.init(domain: "homecredit.co.id.ioness", code: statusCode, userInfo: [NSLocalizedDescriptionKey: desc])
+        let code = (statusCode ?? (originalError as NSError?)?.code) ?? NSURLErrorUnknown
+        let desc: String = description ?? (NetworkSessionError.statusCodeMesage[code] ?? "Unknown Custom Error")
+        super.init(domain: "homecredit.co.id.ioness", code: code, userInfo: [NSLocalizedDescriptionKey: desc])
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+}
+
+public extension Error {
+    var causeByCancel: Bool { (self as NSError).code == NSURLErrorCancelled }
 }

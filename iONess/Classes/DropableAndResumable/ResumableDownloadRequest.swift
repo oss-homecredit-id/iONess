@@ -98,12 +98,12 @@ public class ResumableDownloadRequest: BaseDropableURLRequest<URLResponse, Downl
             try FileManager.default.moveItem(at: url, to: targetUrl)
             return nil
         } catch {
-           return error
+            return error
         }
     }
     
     static func download(
-        for dropable: ResumableDownloadRequest?,
+        for resumable: ResumableDownloadRequest,
         resumeData: Data? = nil,
         in networkSessionManager: NetworkSessionManager,
         with request: URLRequest,
@@ -111,7 +111,7 @@ public class ResumableDownloadRequest: BaseDropableURLRequest<URLResponse, Downl
         _ retryControl: RetryControl?,
         _ validator: URLValidator?,
         _ completion: @escaping (DownloadResult) -> Void) -> URLSessionDownloadTask {
-        let downloadCompletion: (URL?, URLResponse?, Error?) -> Void = { [weak dropable] url, response, error in
+        let downloadCompletion: (URL?, URLResponse?, Error?) -> Void = { url, response, error in
             guard let errorAfterValidate = moveResult(into: targetUrl, from: url, currentError: error, response: response) ?? validate(response: response, with: validator) else {
                 completion(
                     .init(
@@ -127,8 +127,8 @@ public class ResumableDownloadRequest: BaseDropableURLRequest<URLResponse, Downl
                 error: errorAfterValidate,
                 request: request,
                 response, {
-                    dropable?.task = Self.download(
-                        for: dropable,
+                    resumable.task = Self.download(
+                        for: resumable,
                         in: networkSessionManager,
                         with: request,
                         targetUrl: targetUrl,

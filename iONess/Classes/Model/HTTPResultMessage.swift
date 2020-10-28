@@ -18,7 +18,7 @@ public struct HTTPResultMessage: HTTPMessage {
         var headers: HTTPRequestMessage.Header = [:]
         for member in httpResponse.allHeaderFields {
             guard let key = member.key as? String,
-                let value = member.value as? String else { continue }
+                  let value = member.value as? String else { continue }
             headers[key] = value
         }
         self.headers = headers

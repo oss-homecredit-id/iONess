@@ -85,6 +85,7 @@
 		739AB89F25402F3700EFB629 /* NetworkSessionManager+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 739AB89E25402F3700EFB629 /* NetworkSessionManager+Extensions.swift */; };
 		739AB8B22540525300EFB629 /* NetworkRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 739AB8B12540525300EFB629 /* NetworkRequest.swift */; };
 		739AB8B92540529600EFB629 /* DuplicatedHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 739AB8B82540529600EFB629 /* DuplicatedHandler.swift */; };
+		73F38E1825482D05005D9644 /* LockRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73F38E1725482D05005D9644 /* LockRunner.swift */; };
 		7460C7CD0497AAE90DA55B895F47DEC4 /* DSL.swift in Sources */ = {isa = PBXBuildFile; fileRef = 560E5610625EB24314B48FCA0575670A /* DSL.swift */; settings = {COMPILER_FLAGS = "-DPRODUCT_NAME=Nimble/Nimble"; }; };
 		76049DE81EB1E2B6C436086630F77CA0 /* NMBStringify.m in Sources */ = {isa = PBXBuildFile; fileRef = 5270361224437AC02141E27EB379DABF /* NMBStringify.m */; settings = {COMPILER_FLAGS = "-DPRODUCT_NAME=Nimble/Nimble"; }; };
 		7A5B1CC9274B3E4E10EE1561F3AFD58E /* Callsite.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15C89B2DC4D79FB8F6A690175A35A6DF /* Callsite.swift */; };
@@ -292,6 +293,7 @@
 		739AB89E25402F3700EFB629 /* NetworkSessionManager+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NetworkSessionManager+Extensions.swift"; sourceTree = "<group>"; };
 		739AB8B12540525300EFB629 /* NetworkRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkRequest.swift; sourceTree = "<group>"; };
 		739AB8B82540529600EFB629 /* DuplicatedHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuplicatedHandler.swift; sourceTree = "<group>"; };
+		73F38E1725482D05005D9644 /* LockRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockRunner.swift; sourceTree = "<group>"; };
 		7C506A3350F263C8D84B9BBEAFE4773F /* PostNotification.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = PostNotification.swift; path = Sources/Nimble/Matchers/PostNotification.swift; sourceTree = "<group>"; };
 		7C70EB7B5190D124F405BEC5994EAE88 /* DSL.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = DSL.swift; path = Sources/Quick/DSL/DSL.swift; sourceTree = "<group>"; };
 		7F91C9989726FD623E3BC9D2301B93CB /* CwlDarwinDefinitions.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CwlDarwinDefinitions.swift; path = Carthage/Checkouts/CwlPreconditionTesting/Sources/CwlPreconditionTesting/CwlDarwinDefinitions.swift; sourceTree = "<group>"; };
@@ -511,6 +513,7 @@
 				73562EF3253FD2050063EEC3 /* URLCompatible.swift */,
 				73562EFA253FD2310063EEC3 /* URLRequestBuilder.swift */,
 				73562F01253FD2580063EEC3 /* URLValidator.swift */,
+				73F38E1725482D05005D9644 /* LockRunner.swift */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -999,6 +1002,7 @@
 				73562ED8253FD1530063EEC3 /* NetworkSessionManager.swift in Sources */,
 				73562F35253FD4910063EEC3 /* DropableAndResumable.swift in Sources */,
 				73562E9C253FD0070063EEC3 /* NetworkSessionError.swift in Sources */,
+				73F38E1825482D05005D9644 /* LockRunner.swift in Sources */,
 				73562EF4253FD2050063EEC3 /* URLCompatible.swift in Sources */,
 				73562F02253FD2580063EEC3 /* URLValidator.swift in Sources */,
 				73562F51253FD4F90063EEC3 /* ResumableDownloadRequest.swift in Sources */,

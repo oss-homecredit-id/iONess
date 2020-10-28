@@ -19,7 +19,8 @@ class IntegratedTestSpec: QuickSpec {
             var secondResult: URLResult?
             let request = Ness(onDuplicated: .keepAllCompletion)
                 .httpRequest(.get, withUrl: "https://jsonplaceholder.typicode.com/todos/\(randomNumber)")
-                .prepareDataRequest()
+                .prepareDataRequest(with: CounterRetryControl(maxRetryCount: 3))
+                .validate(statusCodes: 200..<300)
             request.then { result in
                 firstResult = result
             }
@@ -47,7 +48,8 @@ class IntegratedTestSpec: QuickSpec {
             var secondResult: URLResult?
             let request = Ness(onDuplicated: .dropPreviousRequest)
                 .httpRequest(.get, withUrl: "https://jsonplaceholder.typicode.com/todos/\(randomNumber)")
-                .prepareDataRequest()
+                .prepareDataRequest(with: CounterRetryControl(maxRetryCount: 3))
+                .validate(statusCodes: 200..<300)
             request.then { result in
                 firstResult = result
             }
@@ -70,7 +72,8 @@ class IntegratedTestSpec: QuickSpec {
             var firstResult: URLResult?
             let request = Ness(onDuplicated: .keepFirstCompletion)
                 .httpRequest(.get, withUrl: "https://jsonplaceholder.typicode.com/todos/\(randomNumber)")
-                .prepareDataRequest()
+                .prepareDataRequest(with: CounterRetryControl(maxRetryCount: 3))
+                .validate(statusCodes: 200..<300)
             waitUntil(timeout: 15) { done in
                 request.then { result in
                     firstResult = result
@@ -92,7 +95,8 @@ class IntegratedTestSpec: QuickSpec {
             var secondResult: URLResult?
             let request = Ness(onDuplicated: .keepLatestCompletion)
                 .httpRequest(.get, withUrl: "https://jsonplaceholder.typicode.com/todos/\(randomNumber)")
-                .prepareDataRequest()
+                .prepareDataRequest(with: CounterRetryControl(maxRetryCount: 3))
+                .validate(statusCodes: 200..<300)
             waitUntil(timeout: 15) { done in
                 request.then { _ in
                     fail("This completion should not be executed")
@@ -115,7 +119,8 @@ class IntegratedTestSpec: QuickSpec {
             waitUntil(timeout: 15) { done in
                 Ness.default
                     .httpRequest(.get, withUrl: "https://jsonplaceholder.typicode.com/todos/\(randomNumber)")
-                    .prepareDataRequest()
+                    .prepareDataRequest(with: CounterRetryControl(maxRetryCount: 3))
+                    .validate(statusCodes: 200..<300)
                     .then { result in
                         requestResult = result
                         done()
@@ -154,7 +159,8 @@ class IntegratedTestSpec: QuickSpec {
             waitUntil(timeout: 15) { done in
                 Ness.default
                     .httpRequest(.get, withUrl: "https://jsonplaceholder.typicode.com/posts")
-                    .prepareDataRequest()
+                    .prepareDataRequest(with: CounterRetryControl(maxRetryCount: 3))
+                    .validate(statusCodes: 200..<300)
                     .then { result in
                         requestResult = result
                         done()
@@ -199,7 +205,8 @@ class IntegratedTestSpec: QuickSpec {
                 Ness.default
                     .httpRequest(.post, withUrl: "https://jsonplaceholder.typicode.com/posts")
                     .set(jsonEncodable: JSONPlaceholder(title: "foo", body: "bar", userId: randomNumber))
-                    .prepareDataRequest()
+                    .prepareDataRequest(with: CounterRetryControl(maxRetryCount: 3))
+                    .validate(statusCodes: 200..<300)
                     .then { result in
                         requestResult = result
                         done()
@@ -233,13 +240,35 @@ class IntegratedTestSpec: QuickSpec {
             expect(obj.body).to(equal("bar"))
             expect(obj.completed).to(beNil())
         }
+        it("should aggregate request") {
+            let firstRealUrl: URL = try! "https://jsonplaceholder.typicode.com/todos/\(Int.random(in: 0..<10))".asUrl()
+            let secondRealUrl: URL = try! "https://jsonplaceholder.typicode.com/todos/\(Int.random(in: 10..<20))".asUrl()
+            let firstRequest = Ness.default
+                .httpRequest(.get, withUrl: firstRealUrl)
+                .prepareDataRequest(with: CounterRetryControl(maxRetryCount: 3))
+                .validate(statusCodes: 200..<300)
+            let secondRequest = Ness.default
+                .httpRequest(.get, withUrl: secondRealUrl)
+                .prepareDataRequest(with: CounterRetryControl(maxRetryCount: 3))
+                .validate(statusCodes: 200..<300)
+            var firstResult: URLResult?
+            var secondResult: URLResult?
+            waitUntil(timeout: 15) { done in
+                firstRequest.aggregate(with: secondRequest).then { result in
+                    expect(result.areCompleted).to(beTrue())
+                    expect(result.results.count).to(equal(2))
+                    firstResult = result.results[0]
+                    secondResult = result.results[1]
+                    done()
+                }
+            }
+            let firstUrl = try! firstResult?.httpMessage?.url.asUrl()
+            let secondUrl = try! secondResult?.httpMessage?.url.asUrl()
+            expect(firstUrl).toNot(beNil())
+            expect(secondUrl).toNot(beNil())
+            expect(firstUrl).toNot(equal(secondUrl))
+            expect(firstUrl == firstRealUrl || firstUrl == secondRealUrl).to(beTrue())
+            expect(secondUrl == firstRealUrl || secondUrl == secondRealUrl).to(beTrue())
+        }
     }
-}
-
-struct JSONPlaceholder: Codable {
-    var id: Int = 0
-    var title: String
-    var body: String?
-    var userId: Int?
-    var completed: Bool? = nil
 }

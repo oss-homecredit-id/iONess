@@ -42,8 +42,65 @@ Ness.default
     .httpRequest(.get, withUrl: "https://myurl.com")
     .prepareDataRequest()
     .then { result in
-    // do something with result
+    // do something with result ignoring its state (succeed or fail)
 }
+```
+
+with failure handler:
+
+```swift
+Ness.default
+    .httpRequest(.get, withUrl: "https://myurl.com")
+    .prepareDataRequest()
+    .then(
+        run: { result in
+            // do something with result
+        },
+        whenFailed: { result in
+            // do something with error result
+        }
+    )
+```
+
+with finally:
+
+```swift
+Ness.default
+    .httpRequest(.get, withUrl: "https://myurl.com")
+    .prepareDataRequest()
+    .then(
+        run: { result in
+            // do something with result
+        },
+        whenFailed: { result in
+            // do something with error result
+        },
+        finally: { result in
+            // do something after succeed or fail
+        }
+    )
+```
+
+or with no completion at all:
+
+```swift
+Ness.default
+    .httpRequest(.get, withUrl: "https://myurl.com")
+    .prepareDataRequest()
+    .executeAndForget()
+```
+
+you can do something very readable like this by separating all closure using function:
+
+```swift
+Ness.default
+    .httpRequest(.get, withUrl: "https://myurl.com")
+    .prepareDataRequest()
+    .then(
+        run: updateTheViewWithData,
+        whenFailed: showFailureAlert,
+        finally: removeLoading
+    )
 ```
 
 ### Create Request
@@ -180,12 +237,35 @@ Ness.default
     ..
     ..
     .prepareDataRequest()
-    .then(run: { result in
-        // do something when get response
-    }, whenFailed: { result in
-        // do something when failed
-    }
-)
+    .then(
+        run: { result in
+            // do something when get response
+        }, 
+        whenFailed: { result in
+            // do something when failed
+        }
+    )
+```
+
+Or with finally completion:
+
+```swift
+Ness.default
+    .httpRequest(.get, withUrl: "https://myurl.com")
+    ..
+    ..
+    .prepareDataRequest()
+    .then(
+        run: { result in
+            // do something when get response
+        }, 
+        whenFailed: { result in
+            // do something when failed
+        }, 
+        finally: { result in
+            // do something when after request finished
+        }
+    )
 ```
 
 With custom dispatcher which will be the thread where completion run:
@@ -197,12 +277,9 @@ Ness.default
     ..
     .prepareDataRequest()
     .completionDispatch(on: .global(qos: .background))
-    .then(run: { result in
-        // do something when get response
-    }, whenFailed: { result in
-        // do something when failed
-    }
-)
+    .then { result in
+    // this block will run on DispatchQueue.global(qos: .background)
+}
 ```
 
 The default dispatcher is `DispatchQueue.main`

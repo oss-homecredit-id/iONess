@@ -17,8 +17,8 @@ extension String: URLCompatible {
         var constructedURL: String = ""
         for parameter in parameters {
             guard let key: String = parameter.key.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
-                let value = parameter.value.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else {
-                    continue
+                  let value = parameter.value.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else {
+                continue
             }
             constructedURL = "\(constructedURL)\(key)=\(value)&"
         }
