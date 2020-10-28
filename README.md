@@ -90,6 +90,19 @@ Ness.default
     .executeAndForget()
 ```
 
+you can do something very readable like this by separating all closure using function:
+
+```swift
+Ness.default
+    .httpRequest(.get, withUrl: "https://myurl.com")
+    .prepareDataRequest()
+    .then(
+        run: updateTheViewWithData,
+        whenFailed: showFailureAlert,
+        finally: removeLoading
+    )
+```
+
 ### Create Request
 
 To create request you can do something like this:
