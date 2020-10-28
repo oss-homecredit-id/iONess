@@ -18,29 +18,38 @@ extension NetworkSessionManager: LockRunner {
     }
     
     func removeAndCancelCompletion(for request: URLRequest) {
-        lockedRun {
-            guard let biConsumer = completions.first(where: { $0.key =~ request }) else {
-                return
-            }
-            completions.removeValue(forKey: biConsumer.key)
-            biConsumer.value(
-                nil,
-                nil,
-                NetworkSessionError(
-                    description: "iONess Error: Cancelled by NetworkSessionManager"
-                )
-            )
+        let result = lockedRun {
+            completions.first(where: { $0.key =~ request })
         }
+        guard let biConsumer = result else {
+            return
+        }
+        lockedRun {
+            completions.removeValue(forKey: biConsumer.key)
+        }
+        biConsumer.value(
+            nil,
+            nil,
+            NetworkSessionError(
+                statusCode: NSURLErrorCancelled,
+                description: "iONess Error: Cancelled by NetworkSessionManager"
+            )
+        )
+        
     }
     
     func removeAndGetCompletion<Param>(for request: URLRequest) -> URLCompletion<Param>? {
-        lockedRun {
-            guard let biConsumer = completions.first(where: { $0.key =~ request }) else {
-                return nil
-            }
-            completions.removeValue(forKey: biConsumer.key)
-            return { biConsumer.value($0, $1, $2) }
+        let result = lockedRun {
+            completions.first(where: { $0.key =~ request })
         }
+        guard let biConsumer = result else {
+            return nil
+        }
+        lockedRun {
+            completions.removeValue(forKey: biConsumer.key)
+        }
+        return { biConsumer.value($0, $1, $2) }
+        
     }
     
     func currentCompletion<Param>(for request: URLRequest) ->  URLCompletion<Param>? {

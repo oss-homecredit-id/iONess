@@ -188,11 +188,14 @@ extension DropableRequestAggregator {
         }
         
         func cancel() {
-            lockedRun {
+            let requests: [DropableURLRequest<AggregatedResponse>] = lockedRun {
                 canceled = true
-                runningRequests.forEach { $0.drop() }
-                runningRequests.removeAll()
+                return self.runningRequests
             }
+            lockedRun {
+                self.runningRequests.removeAll()
+            }
+            requests.forEach { $0.drop() }
         }
     }
 }

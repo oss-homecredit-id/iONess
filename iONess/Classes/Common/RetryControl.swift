@@ -24,20 +24,24 @@ public class CounterRetryControl: RetryControl, LockRunner {
     var retriedRequests: [URLRequest: Int] = [:]
     
     public func shouldRetry(for request: URLRequest, response: URLResponse?, error: Error, didHaveDecision: @escaping (RetryControlDecision) -> Void) {
-        lockedRun {
-            let counter = retriedRequests[request] ?? 0
-            guard counter < maxRetryCount else {
-                retriedRequests.removeValue(forKey: request)
-                didHaveDecision(.noRetry)
-                return
-            }
-            retriedRequests[request] = counter + 1
-            guard let timeInterval = timeIntervalBeforeTryToRetry else {
-                didHaveDecision(.retry)
-                return
-            }
-            didHaveDecision(.retryAfter(timeInterval))
+        let counter = lockedRun {
+            retriedRequests[request] ?? 0
         }
+        guard counter < maxRetryCount else {
+            lockedRun {
+                retriedRequests.removeValue(forKey: request)
+            }
+            didHaveDecision(.noRetry)
+            return
+        }
+        lockedRun {
+            retriedRequests[request] = counter + 1
+        }
+        guard let timeInterval = timeIntervalBeforeTryToRetry else {
+            didHaveDecision(.retry)
+            return
+        }
+        didHaveDecision(.retryAfter(timeInterval))
     }
     
 }
