@@ -24,9 +24,9 @@ open class UploadRequestPromise: HTTPRequestPromise<URLResponse, URLResult> {
             fileUrl: fileURL,
             retryControl: retryControl,
             urlValidator: urlValidator) { result in
-                dispatcher.async {
-                    closure(result)
-                }
+            dispatcher.async {
+                closure(result)
+            }
         }
     }
 }

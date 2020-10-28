@@ -24,9 +24,9 @@ open class DownloadRequestPromise: HTTPRequestPromise<URLResponse, DownloadResul
             targetUrl: targetUrl,
             retryControl: retryControl,
             urlValidator: urlValidator) { result in
-                dispatcher.async {
-                    closure(result)
-                }
+            dispatcher.async {
+                closure(result)
+            }
         }
     }
 }

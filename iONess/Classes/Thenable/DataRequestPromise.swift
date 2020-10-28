@@ -17,9 +17,9 @@ open class DataRequestPromise<Response: URLResponse>: HTTPRequestPromise<Respons
             request: urlRequest,
             retryControl: retryControl,
             urlValidator: urlValidator) { result in
-                dispatcher.async {
-                    closure(result)
-                }
+            dispatcher.async {
+                closure(result)
+            }
         }
     }
 }

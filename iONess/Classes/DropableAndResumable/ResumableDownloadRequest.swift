@@ -98,7 +98,7 @@ public class ResumableDownloadRequest: BaseDropableURLRequest<URLResponse, Downl
             try FileManager.default.moveItem(at: url, to: targetUrl)
             return nil
         } catch {
-           return error
+            return error
         }
     }
     
