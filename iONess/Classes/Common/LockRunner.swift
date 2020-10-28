@@ -9,11 +9,13 @@ import Foundation
 
 protocol LockRunner {
     var lock: NSLock { get }
+    @discardableResult
     func lockedRun<Result>(_ runner: () -> Result) -> Result
 }
 
 
 extension LockRunner {
+    @discardableResult
     func lockedRun<Result>(_ runner: () -> Result) -> Result {
         lock.lock()
         defer {
