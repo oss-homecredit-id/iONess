@@ -8,8 +8,9 @@
 import Foundation
 
 open class DropableURLRequest<Response: URLResponse>: Dropable {
-    public var status: DropableStatus<Response> { .idle }
-    public func drop() { }
+    open var status: DropableStatus<Response> { .idle }
+    public init() { }
+    open func drop() { }
 }
 
 open class BaseDropableURLRequest<Response: URLResponse, Result>: DropableURLRequest<Response> {

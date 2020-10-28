@@ -28,7 +28,7 @@ public class DropableDataRequest<Response: URLResponse>: BaseDropableURLRequest<
         }
     }
     
-    init(networkSessionManager: NetworkSessionManager,
+    public init(networkSessionManager: NetworkSessionManager,
          request: URLRequest,
          retryControl: RetryControl?,
          urlValidator: URLValidator?,
@@ -90,7 +90,9 @@ public class DropableDataRequest<Response: URLResponse>: BaseDropableURLRequest<
                         .init(
                             response: response,
                             data: data,
-                            error: error
+                            error: error ?? NetworkSessionError(
+                                statusCode: (response as? HTTPURLResponse)?.statusCode
+                            )
                         )
                     )
                 }
