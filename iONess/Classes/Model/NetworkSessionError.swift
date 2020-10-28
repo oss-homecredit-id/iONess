@@ -7,13 +7,20 @@
 
 import Foundation
 
+/// Base Error Protocol for iONess
 public protocol NetworkSessionErrorProtocol: LocalizedError {
+    /// orignal error if have any
     var originalError: Error? { get }
+    /// status code of the error
     var statusCode: Int { get }
 }
 
+public typealias NessError = NetworkSessionError
+
+/// Network Session Error Object
 public class NetworkSessionError: NSError, NetworkSessionErrorProtocol {
     
+    /// List of HTTP Error Code Error
     public static let statusCodeMesage: [Int: String] = [
         NSURLErrorCancelled: "Request Canceled",
         NSURLErrorUnknown: "Unknown Error",
@@ -71,10 +78,13 @@ public class NetworkSessionError: NSError, NetworkSessionErrorProtocol {
         598: "Network read timeout error (Unknown)"
     ]
     
-    private (set) public var originalError: Error?
+    /// orignal error if have any
+    public private(set) var originalError: Error?
     
+    /// status code of the error
     public var statusCode: Int { code }
     
+    /// description of the error
     public var errorDescription: String? { localizedDescription }
     
     init(originalError: Error? = nil, statusCode: Int? = nil, description: String? = nil) {
@@ -90,5 +100,6 @@ public class NetworkSessionError: NSError, NetworkSessionErrorProtocol {
 }
 
 public extension Error {
+    /// will be true if the error code is NSURLErrorCancelled
     var causeByCancel: Bool { (self as NSError).code == NSURLErrorCancelled }
 }
