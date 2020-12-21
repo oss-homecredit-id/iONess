@@ -1,22 +1,24 @@
 {
   "name": "iONess",
-  "version": "0.1.0",
-  "summary": "A short description of iONess.",
-  "description": "TODO: Add long description of the pod here.",
-  "homepage": "https://github.com/nayanda/iONess",
+  "version": "1.2.2",
+  "summary": "iOS Network Session",
+  "description": "iONess is HTTP Request Helper for iOS platform used by HCI iOS App",
+  "homepage": "https://github.com/oss-homecredit-id/iONess",
   "license": {
     "type": "MIT",
     "file": "LICENSE"
   },
   "authors": {
-    "nayanda": "nayanda.haberty@homecredit.co.id"
+    "nayanda": "nayanda1@outlook.com"
   },
   "source": {
-    "git": "https://github.com/nayanda/iONess.git",
-    "tag": "0.1.0"
+    "git": "https://github.com/oss-homecredit-id/iONess.git",
+    "tag": "1.2.2"
   },
   "platforms": {
     "ios": "8.0"
   },
-  "source_files": "iONess/Classes/**/*"
+  "source_files": "iONess/Classes/**/*",
+  "swift_versions": "5.0",
+  "swift_version": "5.0"
 }

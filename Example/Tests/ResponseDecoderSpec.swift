@@ -79,52 +79,45 @@ class ResponseDecoderSpec: QuickSpec {
                 let mock = RandomJSON()
                 let data = try! JSONEncoder().encode(mock)
                 expect {
-                    let decoded = try JSONDecodableDecoder<JSONPlaceholder>().decode(from: data)
-                    return decoded
+                    try JSONDecodableDecoder<JSONPlaceholder>().decode(from: data)
                 }.to(throwError())
             }
             it("should fail decode json array from data") {
                 let mocks: [RandomJSON] = [.init(), .init(), .init(), .init(), .init()]
                 let data = try! JSONEncoder().encode(mocks)
                 expect {
-                    let decoded = try ArrayJSONDecodableDecoder<JSONPlaceholder>().decode(from: data)
-                    return decoded
+                    try ArrayJSONDecodableDecoder<JSONPlaceholder>().decode(from: data)
                 }.to(throwError())
             }
             it("should fail decode json from data") {
                 let data = String.random().data(using: .utf8)!
                 expect {
-                    let decoded = try JSONResponseDecoder().decode(from: data)
-                    return decoded
+                    try JSONResponseDecoder().decode(from: data)
                 }.to(throwError())
             }
             it("should fail decode array json from data") {
                 let data = String.random().data(using: .utf8)!
                 expect {
-                    let decoded = try ArrayJSONResponseDecoder().decode(from: data)
-                    return decoded
+                    try ArrayJSONResponseDecoder().decode(from: data)
                 }.to(throwError())
             }
             it("should fail decode json from data") {
                 let data = String.random().data(using: .utf8)!
                 expect {
-                    let decoded = try PlaceholderJSONDecoder().decode(from: data)
-                    return decoded
+                    try PlaceholderJSONDecoder().decode(from: data)
                 }.to(throwError())
             }
             it("should fail decode json from string") {
                 let data = String.random().data(using: .utf8)!
                 expect {
-                    let decoded = try PlaceholderStringDecoder().decode(from: data)
-                    return decoded
+                    try PlaceholderStringDecoder().decode(from: data)
                 }.to(throwError())
             }
             it("should fail decode array json from data") {
                 let data = String.random().data(using: .utf8)!
                 let decoder = ArrayedJSONDecoder(singleDecoder: PlaceholderJSONDecoder())
                 expect {
-                    let decodeds = try decoder.decode(from: data)
-                    return decodeds
+                    try decoder.decode(from: data)
                 }.to(throwError())
             }
         }
