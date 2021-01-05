@@ -77,7 +77,8 @@ extension BaseDropableURLRequest {
         ) { retryStatus in
             switch retryStatus {
             case .retryAfter(let delay):
-                DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: onRetry)
+                let dispatcher: DispatchQueue = OperationQueue.current?.underlyingQueue ?? .main
+                dispatcher.asyncAfter(deadline: .now() + delay, execute: onRetry)
             case .retry:
                 onRetry()
             case .noRetry:
