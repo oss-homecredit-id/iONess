@@ -32,6 +32,31 @@ public protocol Thenable {
     ///   - deferClosure: closure which will be run after closure or failClosure
     @discardableResult
     func then(run closure: @escaping (Result) -> Void, whenFailed failClosure: @escaping (Result) -> Void, finally deferClosure: @escaping (Result) -> Void) -> DropablePromise
+    
+    
+    /// Method to execute request and then run any method passed
+    /// - Parameters:
+    ///   - observer: object that observe request
+    ///   - method: observer method to call when request completed
+    @discardableResult
+    func then<Observer: AnyObject>(observing observer: Observer, call method: @escaping (Observer) -> ((Result) -> Void)) -> DropablePromise
+    
+    /// Method to execute request and then run any method passed
+    /// - Parameters:
+    ///   - observer: object that observe request
+    ///   - method: observer method to call when succeed
+    ///   - failMethod: observer method to call when fail
+    @discardableResult
+    func then<Observer: AnyObject>(observing observer: Observer, call method: @escaping (Observer) -> ((Result) -> Void), whenFailedCall failMethod: @escaping (Observer) -> ((Result) -> Void)) -> DropablePromise
+    
+    /// Method to execute request and then run any method passed
+    /// - Parameters:
+    ///   - observer: object that observe request
+    ///   - method: observer method to call when succeed
+    ///   - failMethod: observer method to call when fail
+    ///   - finalMethod: observer method to call when request completed
+    @discardableResult
+    func then<Observer: AnyObject>(observing observer: Observer, call method: @escaping (Observer) -> ((Result) -> Void), whenFailedCall failMethod: @escaping (Observer) -> ((Result) -> Void), finallyCall finalMethod: @escaping (Observer) -> ((Result) -> Void)) -> DropablePromise
 }
 
 public extension Thenable {
@@ -53,5 +78,56 @@ public extension Thenable {
                 deferClosure($0)
             }
         )
+    }
+    
+    /// Method to execute request and then run any method passed
+    /// - Parameters:
+    ///   - observer: object that observe task
+    ///   - method: observer method to call when task completed
+    /// - Returns: DropablePromise object
+    @discardableResult
+    func then<Observer: AnyObject>(observing observer: Observer, call method: @escaping (Observer) -> ((Result) -> Void)) -> DropablePromise {
+        return then { [weak observer] result in
+            guard let observer = observer else { return }
+            method(observer)(result)
+        }
+    }
+    
+    /// Method to execute request and then run any method passed
+    /// - Parameters:
+    ///   - observer: object that observe task
+    ///   - method: observer method to call when succeed
+    ///   - failMethod: observer method to call when fail
+    /// - Returns: DropablePromise object
+    @discardableResult
+    func then<Observer: AnyObject>(observing observer: Observer, call method: @escaping (Observer) -> ((Result) -> Void), whenFailedCall failMethod: @escaping (Observer) -> ((Result) -> Void)) -> DropablePromise {
+        return then(run: { [weak observer] result in
+            guard let observer = observer else { return }
+            method(observer)(result)
+        }, whenFailed: { [weak observer] result in
+            guard let observer = observer else { return }
+            failMethod(observer)(result)
+        })
+    }
+    
+    /// Method to execute request and then run any method passed
+    /// - Parameters:
+    ///   - observer: object that observe task
+    ///   - method: observer method to call when succeed
+    ///   - failMethod: observer method to call when fail
+    ///   - finalMethod: observer method to call when task completed
+    /// - Returns: DropablePromise object
+    @discardableResult
+    func then<Observer: AnyObject>(observing observer: Observer, call method: @escaping (Observer) -> ((Result) -> Void), whenFailedCall failMethod: @escaping (Observer) -> ((Result) -> Void), finallyCall finalMethod: @escaping (Observer) -> ((Result) -> Void)) -> DropablePromise {
+        return then(run: { [weak observer] result in
+            guard let observer = observer else { return }
+            method(observer)(result)
+        }, whenFailed: { [weak observer] result in
+            guard let observer = observer else { return }
+            failMethod(observer)(result)
+        }, finally: { [weak observer] result in
+            guard let observer = observer else { return }
+            finalMethod(observer)(result)
+        })
     }
 }
