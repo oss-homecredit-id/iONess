@@ -113,6 +113,81 @@ class IntegratedTestSpec: QuickSpec {
             }
             expect(sResult.isSucceed).to(beTrue())
         }
+        it("should invoke observer method") {
+            let randomNumber: Int = .random(in: 0..<10)
+            var requestResult: URLResult?
+            var observer: SpyObserver<URLResult>!
+            let request = Ness(onDuplicated: .keepAllCompletion)
+                .httpRequest(.get, withUrl: "https://jsonplaceholder.typicode.com/todos/\(randomNumber)")
+                .prepareDataRequest(with: CounterRetryControl(maxRetryCount: 3))
+                .validate(statusCodes: 200..<300)
+            waitUntil(timeout: .seconds(15)) { done in
+                observer = SpyObserver { result in
+                    requestResult = result
+                    done()
+                }
+                request.then(observing: observer, call: SpyObserver.invoke(with:))
+            }
+            guard let result = requestResult else {
+                fail("Fail to get data")
+                return
+            }
+            expect(result.isSucceed).to(beTrue())
+        }
+        it("should invoke one of observer method") {
+            let randomNumber: Int = .random(in: 0..<10)
+            var requestResult: URLResult?
+            var observer: SpyObserver<URLResult>!
+            let request = Ness(onDuplicated: .keepAllCompletion)
+                .httpRequest(.get, withUrl: "https://jsonplaceholder.typicode.com/todos/\(randomNumber)")
+                .prepareDataRequest(with: CounterRetryControl(maxRetryCount: 3))
+                .validate(statusCodes: 200..<300)
+            waitUntil(timeout: .seconds(15)) { done in
+                observer = SpyObserver { result in
+                    requestResult = result
+                    done()
+                }
+                request.then(
+                    observing: observer,
+                    call: SpyObserver.invoke(with:),
+                    whenFailedCall: SpyObserver.invoke(with:)
+                )
+            }
+            guard let result = requestResult else {
+                fail("Fail to get data")
+                return
+            }
+            expect(result.isSucceed).to(beTrue())
+        }
+        it("should invoke observer method twice") {
+            let randomNumber: Int = .random(in: 0..<10)
+            var requestResult: URLResult?
+            var observer: SpyObserver<URLResult>!
+            let request = Ness(onDuplicated: .keepAllCompletion)
+                .httpRequest(.get, withUrl: "https://jsonplaceholder.typicode.com/todos/\(randomNumber)")
+                .prepareDataRequest(with: CounterRetryControl(maxRetryCount: 3))
+                .validate(statusCodes: 200..<300)
+            waitUntil(timeout: .seconds(15)) { done in
+                observer = SpyObserver { result in
+                    requestResult = result
+                    if observer.invokedTime == 2 {
+                        done()
+                    }
+                }
+                request.then(
+                    observing: observer,
+                    call: SpyObserver.invoke(with:),
+                    whenFailedCall: SpyObserver.invoke(with:),
+                    finallyCall: SpyObserver.invoke(with:)
+                )
+            }
+            guard let result = requestResult else {
+                fail("Fail to get data")
+                return
+            }
+            expect(result.isSucceed).to(beTrue())
+            expect(observer.invokedTime).toEventually(equal(2))
+        }
         it("should get json data") {
             let randomNumber: Int = .random(in: 40..<50)
             var requestResult: URLResult?
