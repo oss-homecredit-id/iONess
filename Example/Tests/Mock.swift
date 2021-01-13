@@ -55,3 +55,15 @@ extension String {
         return randomString
     }
 }
+
+class SpyObserver<Result> {
+    var invokedTime: Int = 0
+    let invoked: (Result) -> Void
+    init(_ invoked: @escaping (Result) -> Void) {
+        self.invoked = invoked
+    }
+    func invoke(with result: Result) {
+        invokedTime += 1
+        invoked(result)
+    }
+}

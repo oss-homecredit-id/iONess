@@ -91,16 +91,17 @@ Ness.default
     .executeAndForget()
 ```
 
-you can do something very readable like this by separating all closure using function:
+you can do something very readable like this by using observer method call:
 
 ```swift
 Ness.default
     .httpRequest(.get, withUrl: "https://myurl.com")
     .prepareDataRequest()
     .then(
-        run: updateTheViewWithData,
-        whenFailed: showFailureAlert,
-        finally: removeLoading
+        observing: self,
+        call: Some.updateTheView(withResult:),
+        whenFailedCall: Some.showFailureAlert,
+        finallyCall: Some.removeLoading
     )
 ```
 
@@ -269,7 +270,24 @@ Ness.default
     )
 ```
 
-With custom dispatcher which will be the thread where completion run:
+You could do something similar with observer and its method reference. It will be weak refer to observer and do nothing if the observer is already deinitialised by ARC:
+```swift
+Ness.default
+    .httpRequest(.get, withUrl: "https://myurl.com")
+    ..
+    ..
+    .prepareDataRequest()
+    .then(
+        observing: self,
+        call: Some.updateTheView(withResult:),
+        whenFailedCall: Some.showFailureAlert,
+        finallyCall: Some.removeLoading
+    )
+```
+
+All of the complement method (whenFailedCall, finallyCall) are optional. Use it when you need it.
+
+You could give custom dispatcher which will be the thread where completion run:
 
 ```swift
 Ness.default
