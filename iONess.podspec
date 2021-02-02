@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'iONess'
-  s.version          = '1.2.3'
+  s.version          = '1.2.4'
   s.summary          = 'iOS Network Session'
 
 # This description is used to generate tags and improve search results.
@@ -30,7 +30,7 @@ Pod::Spec.new do |s|
 
   s.ios.deployment_target = '8.0'
 
-  s.source_files = 'iONess/Classes/**/*'
+  s.source_files = 'Sources/iONess/Classes/**/*'
   
   # s.resource_bundles = {
   #   'iONess' => ['iONess/Assets/*.png']
@@ -39,5 +39,5 @@ Pod::Spec.new do |s|
   # s.public_header_files = 'Pod/Classes/**/*.h'
   # s.frameworks = 'UIKit', 'MapKit'
   # s.dependency 'AFNetworking', '~> 2.3'
-  s.swift_version = '5.0'
+  s.swift_version = '5.1'
 end
