@@ -16,12 +16,27 @@ To run the example project, clone the repo, and run `pod install` from the Examp
 
 ## Installation
 
+### Cocoapods
+
 iONess is available through [CocoaPods](https://cocoapods.org). To install
 it, simply add the following line to your Podfile:
 
 ```ruby
 pod 'iONess'
 ```
+
+### Swift Package Manager
+
+First, create a Package.swift file and add this github url. It should look like:
+
+```swift
+dependencies: [
+    .package(url: "https://github.com/oss-homecredit-id/iONess.git", from: "1.2.0")
+]
+```
+
+Then run swift build to build the dependency before you use it
+
 
 ## Contributor
 
