@@ -30,7 +30,7 @@ Pod::Spec.new do |s|
 
   s.ios.deployment_target = '8.0'
 
-  s.source_files = 'Sources/iONess/Classes/**/*'
+  s.source_files = 'iONess/Classes/**/*'
   
   # s.resource_bundles = {
   #   'iONess' => ['iONess/Assets/*.png']
