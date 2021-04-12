@@ -345,5 +345,28 @@ class IntegratedTestSpec: QuickSpec {
             expect(firstUrl == firstRealUrl || firstUrl == secondRealUrl).to(beTrue())
             expect(secondUrl == firstRealUrl || secondUrl == secondRealUrl).to(beTrue())
         }
+        it("should mapping thenable") {
+            let randomNumber: Int = .random(in: 40..<50)
+            var mappedResult: JSONPlaceholder?
+            waitUntil(timeout: .seconds(15)) { done in
+                Ness.default
+                    .httpRequest(.get, withUrl: "https://jsonplaceholder.typicode.com/todos/\(randomNumber)")
+                    .prepareDataRequest(with: CounterRetryControl(maxRetryCount: 3))
+                    .validate(statusCodes: 200..<300)
+                    .map { try? $0.httpMessage?.parseJSONBody(forType: JSONPlaceholder.self) }
+                    .then { result in
+                        mappedResult = result as? JSONPlaceholder
+                        done()
+                    }
+            }
+            guard let obj = mappedResult else {
+                fail("Fail to get data")
+                return
+            }
+            expect(obj.userId).to(beGreaterThan(0))
+            expect(obj.id).to(equal(randomNumber))
+            expect(obj.body).to(beNil())
+            expect(obj.title.isEmpty).toNot(beTrue())
+        }
     }
 }
