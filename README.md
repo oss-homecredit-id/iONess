@@ -452,6 +452,93 @@ the `HTTPResultMessage` have default function to automatically parse the body wh
 - `func parseJSONBody<DOBject: Decodable>(forType type: DOBject.Type) throws -> DOBject`
 - `func parseArrayJSONBody<DObject: Decodable>(forType type: DObject.Type) throws -> [DObject]`
 
+
+### Mapped Request Thenable
+
+If you want to mapping the default result into another result, You could just call map on the any Thenable you want. Lets say you want to work with enumeration instead:
+
+```swift
+enum MyAPIResult<Object: Codable> {
+    case succeed(Object)
+    case empty
+    case fail(Error)
+}
+```
+
+Then you could mapping like this
+
+```swift
+Ness.default
+    .httpRequest(.get, withUrl: "https://myurl.com")
+    ..
+    ..
+    .prepareDataRequest()
+    .map {
+        if let error = $0.error {
+            return MyAPIResult.fail(error)
+        }
+        guard let message = $0.httpMessage else { 
+            return MyAPIResult.empty
+        }
+        do {
+            let object = try message.parseJSONBody(forType: MyObject.self)
+            return MyAPIResult.succeed(object)
+        } catch {
+            return MyAPIResult.fail(error)
+        }
+    }
+    .then { result in
+        switch result {
+            case .succeed(let object):
+            // do something
+            default:
+            // do something
+        }
+    }
+```
+
+Or even create extensions for it:
+
+```swift
+extension URLThenableRequest {
+    func mapped<Object: Codable>(for type: Object.Type) -> MappingThenable<Self, MyAPIResult<Object>> {
+        map {
+            if let error = $0.error {
+                return .fail(error)
+            }
+            guard let message = $0.httpMessage else { 
+                return .empty
+            }
+            do {
+                let object = try message.parseJSONBody(forType: type)
+                return .succeed(object)
+            } catch {
+                return .fail(error)
+            }
+        }
+    }
+}
+```
+
+And simply use it like this:
+
+```swift
+Ness.default
+    .httpRequest(.get, withUrl: "https://myurl.com")
+    ..
+    ..
+    .prepareDataRequest()
+    .mapped(for: MyObject.self)
+    .then { result in
+        switch result {
+            case .succeed(let object):
+            // do something
+            default:
+            // do something
+        }
+    }
+```
+
 ### Validator
 
 You can add validation for the response like this:

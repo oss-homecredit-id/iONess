@@ -18,7 +18,7 @@
   "platforms": {
     "ios": "8.0"
   },
-  "source_files": "Sources/iONess/Classes/**/*",
+  "source_files": "iONess/Classes/**/*",
   "swift_versions": "5.1",
   "swift_version": "5.1"
 }
