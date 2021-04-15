@@ -27,16 +27,15 @@ pod 'iONess'
 
 ### Swift Package Manager
 
-First, create a Package.swift file and add this github url. It should look like:
+iONess is available through [Swift Package Manager](https://swift.org/package-manager/). To install it, 
+simply go to File > Swift Package > Add Swift Package Dependency and add "https://github.com/oss-homecredit-id/iONess.git" as Swift Package URL.
+Or add the following line to Package.swift:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/oss-homecredit-id/iONess.git", from: "1.2.0")
+    .package(url: "https://github.com/oss-homecredit-id/iONess.git", from: "1.0.0")
 ]
 ```
-
-Then run swift build to build the dependency before you use it
-
 
 ## Contributor
 
