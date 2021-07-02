@@ -474,13 +474,13 @@
 		0DCFA82A2C7EF6F4512B96ACF84EDF8B /* iONess */ = {
 			isa = PBXGroup;
 			children = (
-				BB4606F5268F4A0700442824 /* EncoderAndDecoder */,
-				BB4606F4268F497D00442824 /* Control */,
-				BB4606F3268F490600442824 /* Request */,
-				BB4606F2268F48AC00442824 /* Manager */,
 				359F14D18224F8C308C2FA5EEB9F90E3 /* Common */,
+				BB4606F4268F497D00442824 /* Control */,
+				BB4606F5268F4A0700442824 /* EncoderAndDecoder */,
+				BB4606F2268F48AC00442824 /* Manager */,
 				C654FA750A9E385AD533FD9ADE2E69F3 /* Model */,
 				2EAA00F00B10C24F062FB0F26BB36E42 /* Pod */,
+				BB4606F3268F490600442824 /* Request */,
 				474A661132AD543CA7AAF78D1D1E0A72 /* Support Files */,
 			);
 			name = iONess;
@@ -630,12 +630,12 @@
 		474A661132AD543CA7AAF78D1D1E0A72 /* Support Files */ = {
 			isa = PBXGroup;
 			children = (
-				60C0B8D0F359447DA53A05D4D6447778 /* iONess.modulemap */,
 				9A97F9CFFFDCA311F4125B58D2676AFB /* iONess-dummy.m */,
 				6541D0C4EB4CB5CE14514B45E857F816 /* iONess-Info.plist */,
 				69113C442196151529B731B9E5C1A8B0 /* iONess-prefix.pch */,
 				22F7AB0010BF211B1F0A27628A23F960 /* iONess-umbrella.h */,
 				3C1D0655EDD5D7F4C4FE4303E9C1C7E7 /* iONess.debug.xcconfig */,
+				60C0B8D0F359447DA53A05D4D6447778 /* iONess.modulemap */,
 				7C1AD7BB429A6B5A9DE037342FEF2485 /* iONess.release.xcconfig */,
 			);
 			name = "Support Files";
@@ -744,9 +744,9 @@
 			isa = PBXGroup;
 			children = (
 				C38CC4CD64DD36506708F00D75B61D25 /* RequestBuilder.swift */,
-				BB4606F0268EE66700442824 /* Resumable.swift */,
-				BB4606EC268ED75D00442824 /* RequestPromise.swift */,
 				0ACFD8AD41F95B084ACF2D65B9DDB803 /* RequestHandler.swift */,
+				BB4606EC268ED75D00442824 /* RequestPromise.swift */,
+				BB4606F0268EE66700442824 /* Resumable.swift */,
 			);
 			name = Request;
 			path = iONess/Classes/Request;
@@ -757,8 +757,8 @@
 			children = (
 				30B27A4254D49B7A5D168E9CC2A5C570 /* DuplicatedHandler.swift */,
 				7AF31A48C5B95DE583DFE71451E921A2 /* HTTPValidator.swift */,
-				8A648090C6D60B349EE2F2D4F9B83F26 /* RetryControl.swift */,
 				939587FC40EB8257AC045F49EB266F10 /* ResponseValidator.swift */,
+				8A648090C6D60B349EE2F2D4F9B83F26 /* RetryControl.swift */,
 			);
 			name = Control;
 			path = iONess/Classes/Control;
@@ -777,12 +777,12 @@
 		C654FA750A9E385AD533FD9ADE2E69F3 /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				1216704D1A976FC3E845260AB0EFCA8B /* RequestMessage.swift */,
 				F17EDE77E69F45803580EB97B41D5D52 /* HTTPRequestMessage.swift */,
 				1F7A80D220F4D9C37123C39173E13995 /* HTTPResponseMessage.swift */,
 				5384784C7E21682729C90D9DCAF5B06B /* NetworkRequest.swift */,
 				5D59A08420AB73639DE1F67F0CE4AEB6 /* NetworkResult.swift */,
 				2FC645538631BBC78543E64AEF694ADE /* NetworkSessionError.swift */,
+				1216704D1A976FC3E845260AB0EFCA8B /* RequestMessage.swift */,
 			);
 			name = Model;
 			path = iONess/Classes/Model;
