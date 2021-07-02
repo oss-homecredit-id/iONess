@@ -21,7 +21,7 @@ class IntegratedTestSpec: QuickSpec {
                 Ness.default
                     .httpRequest(.get, withUrl: "https://jsonplaceholder.typicode.com/todos/\(randomNumber)")
                     .validate(statusCodes: 200..<300)
-                    .urlRequest(with: CounterRetryControl(maxRetryCount: 3))
+                    .dataRequest(with: CounterRetryControl(maxRetryCount: 3))
                     .then { result in
                         requestResult = result
                         done()
@@ -61,7 +61,7 @@ class IntegratedTestSpec: QuickSpec {
                 Ness.default
                     .httpRequest(.get, withUrl: "https://jsonplaceholder.typicode.com/posts")
                     .validate(statusCodes: 200..<300)
-                    .urlRequest(with: CounterRetryControl(maxRetryCount: 3))
+                    .dataRequest(with: CounterRetryControl(maxRetryCount: 3))
                     .then { result in
                         requestResult = result
                         done()
@@ -107,7 +107,7 @@ class IntegratedTestSpec: QuickSpec {
                     .httpRequest(.post, withUrl: "https://jsonplaceholder.typicode.com/posts")
                     .set(jsonEncodable: JSONPlaceholder(title: "foo", body: "bar", userId: randomNumber))
                     .validate(statusCodes: 200..<300)
-                    .urlRequest(with: CounterRetryControl(maxRetryCount: 3))
+                    .dataRequest(with: CounterRetryControl(maxRetryCount: 3))
                     .then { result in
                         requestResult = result
                         done()
@@ -147,11 +147,11 @@ class IntegratedTestSpec: QuickSpec {
             let firstRequest = Ness.default
                 .httpRequest(.get, withUrl: firstRealUrl)
                 .validate(statusCodes: 200..<300)
-                .urlRequest(with: CounterRetryControl(maxRetryCount: 3))
+                .dataRequest(with: CounterRetryControl(maxRetryCount: 3))
             let secondRequest = Ness.default
                 .httpRequest(.get, withUrl: secondRealUrl)
                 .validate(statusCodes: 200..<300)
-                .urlRequest(with: CounterRetryControl(maxRetryCount: 3))
+                .dataRequest(with: CounterRetryControl(maxRetryCount: 3))
             var firstResult: URLResult?
             var secondResult: URLResult?
             

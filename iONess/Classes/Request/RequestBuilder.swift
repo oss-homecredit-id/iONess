@@ -130,7 +130,7 @@ open class RequestBuilder {
     /// Create DataPromise with builded HTTP Request. It will automatically run the request
     /// - Parameter retryControl: Retry Control
     /// - Returns: DataPromise
-    open func urlRequest(with retryControl: RetryControl? = nil) -> DataPromise {
+    open func dataRequest(with retryControl: RetryControl? = nil) -> DataPromise {
         DataPromise(request: httpRequest, with: networkSessionManager, retryControl: retryControl, validator: responseValidator)
     }
     
