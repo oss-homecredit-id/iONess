@@ -331,16 +331,16 @@ open class DownloadRequestHandler: RequestHandler, Resumable {
     func createTask(with completion: @escaping (DownloadResult) -> Void) -> URLSessionDownloadTask {
         let handler = self
         return networkSessionManager.downloadTask(with: request, resumeData: dataInProgress) { tempUrl, response, error in
-            guard let error = error ?? (
+            guard let errorHappens = error ?? (
                     handler.moveResult(from: tempUrl, response: response)
                         ?? handler.validate(response: response)) else {
                 completion(.init(response: response, dataLocalURL: handler.targetUrl, error: error))
                 return
             }
-            handler.retryIfShould(error: error, response: response) {
+            handler.retryIfShould(error: errorHappens, response: response) {
                 handler.doRequest(then: completion)
             } onNoRetry: {
-                completion(.init(response: response, dataLocalURL: handler.targetUrl, error: error))
+                completion(.init(response: response, dataLocalURL: handler.targetUrl, error: errorHappens))
             }
         }
     }
