@@ -17,7 +17,7 @@ To run the example project, clone the repo, and run `pod install` from the Examp
 
 - Swift 5.0 or higher (or 5.1 when using Swift Package Manager)
 - iOS 10 or higher (latest version)
-- iOS 8 or higher (1.0.0 until 1.2.5 version)
+- iOS 8 or higher (1.2.5 version)
 
 ### Only Swift Package Manager
 
@@ -30,26 +30,28 @@ To run the example project, clone the repo, and run `pod install` from the Examp
 
 iONess is available through [CocoaPods](https://cocoapods.org). To install it, simply add the following line to your Podfile:
 
+for iOS 10 or higher
+
 ```ruby
 pod 'iONess', '~> 2.0.0'
 ```
 
-or for iOS 8 or lower
+or for iOS 8 or higher
 
 ```ruby
-pod 'iONess', '~> 1.2.0'
+pod 'iONess', '~> 1.2.5'
 ```
 
 ### Swift Package Manager from XCode
 
 - Add it using xcode menu **File > Swift Package > Add Package Dependency**
 - Add **https://github.com/oss-homecredit-id/iONess.git** as Swift Package url
-- Set rules at **version**, with **Up to Next Major** option and put **2.0.0** as its version or **1.2.0** for iOS 8 or lower
+- Set rules at **version**, with **Up to Next Major** option and put **2.0.0** as its version for iOS 10 or higher or **1.2.5** for iOS 8 or higher
 - Click next and wait
 
 ### Swift Package Manager from Package.swift
 
-Add as your target dependency in **Package.swift**. Use **2.0.0** as its version or **1.2.0** for iOS 8 or lower
+Add as your target dependency in **Package.swift**. Use **2.0.0** as its version for iOS 10 or higher or **1.2.5** for iOS 8 or higher
 
 ```swift
 dependencies: [
