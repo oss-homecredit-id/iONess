@@ -80,7 +80,7 @@ extension NetworkSessionManager: LockRunner {
         }
     }
     
-    func downloadTask(with request: URLRequest, completionHandler: @escaping URLCompletion<URL>) -> URLSessionDownloadTask {
+    func downloadTask(with request: URLRequest, resumeData: Data? = nil, completionHandler: @escaping URLCompletion<URL>) -> URLSessionDownloadTask {
         let updatedRequest = delegate?.ness(self, willRequest: request) ?? request
         defer {
             delegate?.ness(self, didRequest: updatedRequest)
@@ -98,7 +98,8 @@ extension NetworkSessionManager: LockRunner {
                 return task
             }
         }
-        let task = session.downloadTask(with: updatedRequest) { [weak self] url, response, error in
+        let task: URLSessionDownloadTask
+        let taskCompletion: (URL?, URLResponse?, Error?) -> Void = { [weak self] url, response, error in
             guard let self = self else {
                 completion(url, response, error)
                 return
@@ -106,12 +107,16 @@ extension NetworkSessionManager: LockRunner {
             let currentCompletion: URLCompletion<URL>? = self.removeAndGetCompletion(for: updatedRequest)
             currentCompletion?(url, response, error)
         }
+        if let data = resumeData {
+            task = session.downloadTask(withResumeData: data, completionHandler: taskCompletion)
+        } else {
+            task = session.downloadTask(with: request, completionHandler: taskCompletion)
+        }
         assign(for: updatedRequest, task: task, completion: completion)
-        task.resume()
         return task
     }
     
-    func uploadTask(with request: URLRequest, fromFile fileURL: URL, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionUploadTask {
+    func uploadTask(with request: URLRequest, fromFile fileURL: URL, completionHandler: @escaping URLCompletion<Data>) -> URLSessionUploadTask {
         let updatedRequest = delegate?.ness(self, willRequest: request) ?? request
         defer {
             delegate?.ness(self, didRequest: updatedRequest)
@@ -138,11 +143,10 @@ extension NetworkSessionManager: LockRunner {
             currentCompletion?(data, response, error)
         }
         assign(for: updatedRequest, task: task, completion: completion)
-        task.resume()
         return task
     }
     
-    func dataTask(with request: URLRequest, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask {
+    func dataTask(with request: URLRequest, completionHandler: @escaping URLCompletion<Data>) -> URLSessionDataTask {
         let updatedRequest = delegate?.ness(self, willRequest: request) ?? request
         defer {
             delegate?.ness(self, didRequest: updatedRequest)
@@ -169,7 +173,6 @@ extension NetworkSessionManager: LockRunner {
             currentCompletion?(data, response, error)
         }
         assign(for: updatedRequest, task: task, completion: completion)
-        task.resume()
         return task
     }
     

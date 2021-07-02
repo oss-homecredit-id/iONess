@@ -18,7 +18,7 @@ public protocol NetworkSessionErrorProtocol: LocalizedError {
 public typealias NessError = NetworkSessionError
 
 /// Network Session Error Object
-public class NetworkSessionError: NSError, NetworkSessionErrorProtocol {
+public final class NetworkSessionError: NSError, NetworkSessionErrorProtocol {
     
     /// List of HTTP Error Code Error
     public static let statusCodeMesage: [Int: String] = [

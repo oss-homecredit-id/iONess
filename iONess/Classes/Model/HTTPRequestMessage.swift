@@ -7,14 +7,20 @@
 
 import Foundation
 
-public class HTTPRequestMessage: HTTPMessage {
+/// HTTP Request Message
+public final class HTTPRequestMessage: RequestMessage {
     public typealias Header = Dictionary<String, String>
     public typealias URLParameters = Dictionary<String, String>
+    /// URL of the request
     public var url: URLCompatible = ""
+    /// headers of the request
     public var headers: Header = [:]
+    /// method of the request
     public var method: Method = .get
+    /// parameters of the request
     public var urlParameters: Header = [:]
-    public var encoder: HTTPBodyEncoder? {
+    /// current request body encoder
+    public var encoder: RequestBodyEncoder? {
         willSet {
             encoder?.relatedHeaders?.forEach { key, _ in
                 headers.removeValue(forKey: key)
@@ -26,12 +32,14 @@ public class HTTPRequestMessage: HTTPMessage {
             }
         }
     }
+    /// encoded body
     public var encodedBody: Any? {
         didSet {
             _body = nil
         }
     }
     private var _body: Data?
+    /// data representation of body
     public var body: Data? {
         get {
             if _body == nil && encodedBody != nil {
@@ -43,10 +51,16 @@ public class HTTPRequestMessage: HTTPMessage {
             _body = newValue
         }
     }
+    /// URL + URL Parameters
+    /// - Throws: Error when failed to build a URL
+    /// - Returns: URL
     public func getFullUrl() throws -> URL {
         try url.asUrl(with: urlParameters)
     }
     
+    /// Get encoded data body
+    /// - Throws: Error when failed to encode body into data
+    /// - Returns: Data encoded body
     public func getDataBody() throws -> Data {
         guard let body = encodedBody else {
             throw NetworkSessionError(originalError: nil, statusCode: -1, description: "iONess Error: No HTTPBody")
@@ -59,8 +73,11 @@ public class HTTPRequestMessage: HTTPMessage {
         }
         return try encoder.encode(body)
     }
-    
-    public enum Method {
+}
+
+public extension HTTPRequestMessage {
+    /// Request method
+    enum Method {
         case post
         case get
         case put

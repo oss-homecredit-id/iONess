@@ -1,5 +1,5 @@
 //
-//  HTTPResultMessage.swift
+//  HTTPResponseMessage.swift
 //  iONess
 //
 //  Created by Nayanda Haberty (ID) on 21/10/20.
@@ -7,11 +7,16 @@
 
 import Foundation
 
-public struct HTTPResultMessage: HTTPMessage {
+/// HTTP Response Message
+public struct HTTPResponseMessage: RequestMessage {
     public typealias Header = Dictionary<String, String>
+    /// URL of response
     public let url: URLCompatible
+    /// headers of response
     public let headers: Header
+    /// body of response
     public let body: Data?
+    /// status code of response
     public let statusCode: Int
     
     init(httpResponse: HTTPURLResponse, body: Data? = nil) {
@@ -28,9 +33,13 @@ public struct HTTPResultMessage: HTTPMessage {
     }
 }
 
-extension HTTPResultMessage {
+public extension HTTPResponseMessage {
     
-    public func parseBody(toStringEndcoded encoding: String.Encoding = .utf8) throws -> String {
+    /// Parse body into string
+    /// - Parameter encoding: String encoding
+    /// - Throws: Error when fail to parse
+    /// - Returns: String encoded
+    func parseBody(toStringEndcoded encoding: String.Encoding = .utf8) throws -> String {
         guard let data = body else {
             throw NetworkSessionError(description: "iONess Error: no result to decode")
         }
@@ -40,14 +49,21 @@ extension HTTPResultMessage {
         return result
     }
     
-    public func parseBody<Decoder: ResponseDecoder>(using decoder: Decoder) throws -> Decoder.Decoded {
+    /// Parse body using decoder
+    /// - Parameter decoder: Decoder
+    /// - Throws: Error when fail to parse
+    /// - Returns: Decoded body
+    func parseBody<Decoder: ResponseDecoder>(using decoder: Decoder) throws -> Decoder.Decoded {
         guard let data = body else {
             throw NetworkSessionError(description: "iONess Error: no result to decode")
         }
         return try decoder.decode(from: data)
     }
     
-    public func parseJSONBody() throws -> [String: Any] {
+    /// Parse body into Dictionary representation of JSON
+    /// - Throws: Error when fail to parse
+    /// - Returns: Decoded JSON
+    func parseJSONBody() throws -> [String: Any] {
         guard let data = body else {
             throw NetworkSessionError(description: "iONess Error: no result to decode")
         }
@@ -57,7 +73,10 @@ extension HTTPResultMessage {
         return json
     }
     
-    public func parseArrayJSONBody() throws -> [Any] {
+    /// Parse body into Array representation of JSON
+    /// - Throws: Error when fail to parse
+    /// - Returns: Decoded JSON
+    func parseArrayJSONBody() throws -> [Any] {
         guard let data = body else {
             throw NetworkSessionError(description: "iONess Error: no result to decode")
         }
@@ -67,28 +86,42 @@ extension HTTPResultMessage {
         return arrayJSON
     }
     
-    public func parseJSONBody<DObject: Decodable>() throws -> DObject {
+    /// Parse JSON body into decodable object
+    /// - Throws: Error when fail to parse
+    /// - Returns: Decoded JSON
+    func parseJSONBody<DObject: Decodable>() throws -> DObject {
         guard let data = body else {
             throw NetworkSessionError(description: "iONess Error: no result to decode")
         }
         return try JSONDecodableDecoder().decode(from: data)
     }
     
-    public func parseArrayJSONBody<DObject: Decodable>() throws -> [DObject] {
+    /// Parse Array JSON body into array of decodable object
+    /// - Throws: Error when fail to parse
+    /// - Returns: Decoded JSON
+    func parseArrayJSONBody<DObject: Decodable>() throws -> [DObject] {
         guard let data = body else {
             throw NetworkSessionError(description: "iONess Error: no result to decode")
         }
         return try ArrayJSONDecodableDecoder().decode(from: data)
     }
     
-    public func parseJSONBody<DOBject: Decodable>(forType type: DOBject.Type) throws -> DOBject {
+    /// Parse JSON body into decodable object
+    /// - Parameter type: type of decodable object
+    /// - Throws: Error when fail to parse
+    /// - Returns: Decoded JSON
+    func parseJSONBody<DOBject: Decodable>(forType type: DOBject.Type) throws -> DOBject {
         guard let data = body else {
             throw NetworkSessionError(description: "iONess Error: no result to decode")
         }
         return try JSONDecodableDecoder().decode(from: data)
     }
     
-    public func parseArrayJSONBody<DObject: Decodable>(forType type: DObject.Type) throws -> [DObject] {
+    /// Parse JSON body into array of decodable object
+    /// - Parameter type: type of decodable object
+    /// - Throws: Error when fail to parse
+    /// - Returns: Decoded JSON
+    func parseArrayJSONBody<DObject: Decodable>(forType type: DObject.Type) throws -> [DObject] {
         guard let data = body else {
             throw NetworkSessionError(description: "iONess Error: no result to decode")
         }

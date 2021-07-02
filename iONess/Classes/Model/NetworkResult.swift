@@ -41,8 +41,8 @@ public struct URLResult: NetworkResult {
     public let responseData: Data?
     /// Network request error
     public let error: Error?
-    /// HTTPResultMessage object which parsed most of response
-    public var httpMessage: HTTPResultMessage? {
+    /// HTTPResponseMessage object which parsed most of response
+    public var httpMessage: HTTPResponseMessage? {
         guard let response = urlResponse as? HTTPURLResponse else { return nil }
         return .init(httpResponse: response, body: responseData)
     }
@@ -78,6 +78,23 @@ public struct DownloadResult: NetworkResult {
         error != nil || urlResponse == nil || dataLocalURL == nil
     }
     
+    /// Default Initializer
+    /// - Parameters:
+    ///   - response: request response
+    ///   - dataLocalURL: location of downloaded data
+    ///   - error: error occurs in request
+    public init(response: URLResponse?, dataLocalURL: URL?, error: Error?) {
+        self.urlResponse = response
+        self.dataLocalURL = dataLocalURL
+        self.error = error
+    }
+    
+    /// Init if error
+    /// - Parameter error: error occurs in request
+    public init(error: Error) {
+        self.init(response: nil, dataLocalURL: nil, error: error)
+    }
+    
     func getURL() throws -> URL {
         guard let url = dataLocalURL else {
             throw NetworkSessionError(description: "iONess Error: no URL")
@@ -87,34 +104,17 @@ public struct DownloadResult: NetworkResult {
     /// Method to get downloaded Data, just don't use this method if the data is big, since it will create Data object in the memory
     /// use `getDataStream()` instead
     /// - Throws: Error if the url is not present
-    /// - Returns: Data object
+    /// - Returns: downloaded Data object
     public func getDownloadedData() throws -> Data {
         return try .init(contentsOf: getURL())
     }
     /// Method to get downloaded Data stream
-    /// - Throws: <#description#>
-    /// - Returns: <#description#>
+    /// - Throws: NetworkSessionError
+    /// - Returns: Input Stream of downloaded data
     func getDataStream() throws -> InputStream {
         guard let stream = InputStream(url: try getURL()) else {
             throw NetworkSessionError(description: "iONess Error: failed to get InputStream")
         }
         return stream
-    }
-    
-    /// <#Description#>
-    /// - Parameters:
-    ///   - response: <#response description#>
-    ///   - dataLocalURL: <#dataLocalURL description#>
-    ///   - error: <#error description#>
-    public init(response: URLResponse?, dataLocalURL: URL?, error: Error?) {
-        self.urlResponse = response
-        self.dataLocalURL = dataLocalURL
-        self.error = error
-    }
-    
-    /// <#Description#>
-    /// - Parameter error: <#error description#>
-    public init(error: Error) {
-        self.init(response: nil, dataLocalURL: nil, error: error)
     }
 }
