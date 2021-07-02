@@ -1,9 +1,10 @@
 # iONess
 
-iONess (iOS Network Session) is HTTP Request Helper for iOS platform used by Home Credit Indonesia iOS App
+iONess (iOS Network Session) is HTTP Request Helper for the iOS platform used by Home Credit Indonesia iOS App. It using [Ergo](https://github.com/nayanda1/Ergo) as a concurrent helper and promise pipelining.
 
 ![build](https://github.com/oss-homecredit-id/iONess/workflows/build/badge.svg)
 ![test](https://github.com/oss-homecredit-id/iONess/workflows/test/badge.svg)
+[![SwiftPM Compatible](https://img.shields.io/badge/SwiftPM-Compatible-brightgreen)](https://swift.org/package-manager/)
 [![Version](https://img.shields.io/cocoapods/v/iONess.svg?style=flat)](https://cocoapods.org/pods/iONess)
 [![License](https://img.shields.io/cocoapods/l/iONess.svg?style=flat)](https://cocoapods.org/pods/iONess)
 [![Platform](https://img.shields.io/cocoapods/p/iONess.svg?style=flat)](https://cocoapods.org/pods/iONess)
@@ -14,31 +15,45 @@ To run the example project, clone the repo, and run `pod install` from the Examp
 
 ## Requirements
 
+- Swift 5.0 or higher (or 5.1 when using Swift Package Manager)
+- iOS 10 or higher (latest version)
+- iOS 8 or higher (1.0.0 until 1.2.5 version)
+
+### Only Swift Package Manager
+
+- macOS 10.10 or higher
+- tvOS 10 or higher
+
 ## Installation
 
 ### Cocoapods
 
-iONess is available through [CocoaPods](https://cocoapods.org). To install
-it, simply add the following line to your Podfile:
+iONess is available through [CocoaPods](https://cocoapods.org). To install it, simply add the following line to your Podfile:
 
 ```ruby
-pod 'iONess'
+pod 'iONess', '~> 2.0.0'
+```
+
+or for iOS 8 or lower
+
+```ruby
+pod 'iONess', '~> 1.2.0'
 ```
 
 ### Swift Package Manager from XCode
 
 - Add it using xcode menu **File > Swift Package > Add Package Dependency**
 - Add **https://github.com/oss-homecredit-id/iONess.git** as Swift Package url
-- Set rules at **version**, with **Up to Next Major** option and put **1.0.0** as its version
+- Set rules at **version**, with **Up to Next Major** option and put **2.0.0** as its version or **1.2.0** for iOS 8 or lower
 - Click next and wait
 
 ### Swift Package Manager from Package.swift
 
-Add as your target dependency in **Package.swift**
+Add as your target dependency in **Package.swift**. Use **2.0.0** as its version or **1.2.0** for iOS 8 or lower
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/oss-homecredit-id/iONess.git", .upToNextMajor(from: "1.2.5"))
+  .package(url: "https://github.com/oss-homecredit-id/iONess.git", .upToNextMajor(from: "2.0.0"))
 ]
 ```
 
@@ -46,8 +61,8 @@ Use it in your target as `iONess`
 
 ```swift
  .target(
-    name: "MyModule",
-    dependencies: ["iONess"]
+  name: "MyModule",
+  dependencies: ["iONess"]
 )
 ```
 
@@ -64,74 +79,42 @@ iONess is available under the MIT license. See the LICENSE file for more info.
 
 ### Basic Usage
 
-`iONess` is designed to simplify the request process for HTTP Request. All you need to do is just create the request using `Ness` /  `NetworkSessionManager` class:
+`iONess` is designed to simplify the request process for HTTP Request. All you need to do is just create the request using `Ness` / `NetworkSessionManager` class:
 
 ```swift
 Ness.default
-    .httpRequest(.get, withUrl: "https://myurl.com")
-    .prepareDataRequest()
-    .then { result in
-    // do something with result ignoring its state (succeed or fail)
-}
-```
-
-with failure handler:
-
-```swift
-Ness.default
-    .httpRequest(.get, withUrl: "https://myurl.com")
-    .prepareDataRequest()
-    .then(
-        run: { result in
-            // do something with result
-        },
-        whenFailed: { result in
-            // do something with error result
-        }
-    )
-```
-
-with finally:
-
-```swift
-Ness.default
-    .httpRequest(.get, withUrl: "https://myurl.com")
-    .prepareDataRequest()
-    .then(
-        run: { result in
-            // do something with result
-        },
-        whenFailed: { result in
-            // do something with error result
-        },
-        finally: { result in
-            // do something after succeed or fail
-        }
-    )
+  .httpRequest(.get, withUrl: "https://myurl.com")
+  .dataRequest()
+  .then { result in
+    // do something with result this will not executed when request failed
+  }
 ```
 
 or with no completion at all:
 
 ```swift
 Ness.default
-    .httpRequest(.get, withUrl: "https://myurl.com")
-    .prepareDataRequest()
-    .executeAndForget()
+  .httpRequest(.get, withUrl: "https://myurl.com")
+  .dataRequest()
 ```
 
-you can do something very readable like this by using observer method call:
+When data `dataRequest()` is called, it will always execute the request right away no matter it have completion or not.
+`dataRequest()` actually returning `Promise` object from [Ergo](https://github.com/nayanda1/Ergo) so you could always do everything you can do with `Ergo Promise`:
 
 ```swift
 Ness.default
-    .httpRequest(.get, withUrl: "https://myurl.com")
-    .prepareDataRequest()
-    .then(
-        observing: self,
-        call: Some.updateTheView(withResult:),
-        whenFailedCall: Some.showFailureAlert,
-        finallyCall: Some.removeLoading
-    )
+  .httpRequest(.get, withUrl: "https://myurl.com")
+  .dataRequest()
+  .then { result in
+    // do something with result this will not executed when request failed
+  }.handle { error in
+    // do something if error occurs
+  }.finally { result, error in
+    // do something regarding of error or not after request completed
+  }
 ```
+
+You could always check [Ergo here](https://github.com/nayanda1/Ergo) about what its promise can do.
 
 ### Create Request
 
@@ -139,11 +122,11 @@ To create request you can do something like this:
 
 ```swift
 Ness.default.httpRequest(.get, withUrl: "https://myurl.com")
-    .set(urlParameters: ["param1": "value1", "param2": "value2"])
-    .set(headers: ["Authorization": myToken])
-    .set(body: dataBody)
-    ..
-    ..
+  .set(urlParameters: ["param1": "value1", "param2": "value2"])
+  .set(headers: ["Authorization": myToken])
+  .set(body: dataBody)
+  ..
+  ..
 ```
 or with customize `URLSession`:
 
@@ -160,14 +143,14 @@ let ness = Ness(with: session)
 
 // create request
 ness.httpRequest(.get, withUrl: "https://myurl.com")
-    .set(urlParameters: ["param1": "value1", "param2": "value2"])
-    .set(headers: ["Authorization": myToken])
-    .set(body: dataBody)
-    ..
-    ..
+  .set(urlParameters: ["param1": "value1", "param2": "value2"])
+  .set(headers: ["Authorization": myToken])
+  .set(body: dataBody)
+  ..
+  ..
 ```
 
-it's better to save the instance of Ness and reused it since it will be just creating the request with same `URLSession` unless you want to use any other `URLSession` for other request.
+it's better to save the instance of Ness and reused it since it will be just creating the request with the same `URLSession` unless you want to use any other `URLSession` for another request.
 
 available enumeration for HTTP Method to use are: 
 - `post`
@@ -186,20 +169,20 @@ to set custom type of body, you need to pass those custom type encoder which imp
 
 ```swift
 Ness.default.httpRequest(.get, withUrl: "https://myurl.com")
-    .set(body: myObject, with encoder: myEndoder) -> Self
-    ..
-    ..
+  .set(body: myObject, with encoder: myEndoder) -> Self
+  ..
+  ..
 ```
 
 The declaration of `HTTPBodyEncoder` is:
 
 ```swift
 public protocol HTTPBodyEncoder {
-    var relatedHeaders: [String: String]? { get }
-    func encoder(_ any: Any) throws -> Data
+  var relatedHeaders: [String: String]? { get }
+  func encoder(_ any: Any) throws -> Data
 }
 ```
-the relatedHeaders is the associated header with this encoding which will auto assigned to the request headers. those method are optional since the default implementation are returning nil
+the `relatedHeaders` is the associated header with this encoding which will auto-assigned to the request headers. this variable is optional since the default implementation are returning nil
 
 there some different default method to set the body with iONess default body encoder which are:
 - `func set(body: Data) -> Self`
@@ -213,195 +196,124 @@ After the request is ready then prepare the request which will return Thenable:
 
 ```swift
 Ness.default.httpRequest(.get, withUrl: "https://myurl.com")
-    .set(urlParameters: ["param1": "value1", "param2": "value2"])
-    .set(headers: ["Authorization": myToken])
-    .set(body: dataBody)
-    ..
-    ..
-    .prepareDataRequest()
+  .set(urlParameters: ["param1": "value1", "param2": "value2"])
+  .set(headers: ["Authorization": myToken])
+  .set(body: dataBody)
+  ..
+  ..
+  .dataRequest()
 ```
 or for download, you need to give target location `URL` where you want to downloaded data to be saved:
 
 ```swift
 Ness.default.httpRequest(.get, withUrl: "https://myurl.com")
-    .set(urlParameters: ["param1": "value1", "param2": "value2"])
-    .set(headers: ["Authorization": myToken])
-    .set(body: dataBody)
-    ..
-    ..
-    .prepareDownloadRequest(targetSavedUrl: myTargetUrl)
+  .set(urlParameters: ["param1": "value1", "param2": "value2"])
+  .set(headers: ["Authorization": myToken])
+  .set(body: dataBody)
+  ..
+  ..
+  .downloadRequest(forSavedLocation: myTargetUrl)
 ```
 
 or for updload you need to give file location `URL` which you want to upload:
 
 ```swift
 Ness.default.httpRequest(.get, withUrl: "https://myurl.com")
-    .set(urlParameters: ["param1": "value1", "param2": "value2"])
-    .set(headers: ["Authorization": myToken])
-    .set(body: dataBody)
-    ..
-    ..
-    .prepareUploadRequest(withFileLocation: myTargetUrl)
+  .set(urlParameters: ["param1": "value1", "param2": "value2"])
+  .set(headers: ["Authorization": myToken])
+  .set(body: dataBody)
+  ..
+  ..
+  .uploadRequest(forFileLocation: myTargetUrl)
 ```
 
-### Data Request Thenable
+### Data Request Promise
 
 After creating data request, you can just execute the request with then method:
 
 ```swift
 Ness.default
-    .httpRequest(.get, withUrl: "https://myurl.com")
-    ..
-    ..
-    .prepareDataRequest()
-    .then { result in
-    // do something with result
+  .httpRequest(.get, withUrl: "https://myurl.com")
+  ..
+  ..
+  .dataRequest()
+  .then { result in
+  // do something with result
 }
 ```
 
-Or with separate completion:
-
-```swift
-Ness.default
-    .httpRequest(.get, withUrl: "https://myurl.com")
-    ..
-    ..
-    .prepareDataRequest()
-    .then(
-        run: { result in
-            // do something when get response
-        }, 
-        whenFailed: { result in
-            // do something when failed
-        }
-    )
-```
-
-Or with finally completion:
-
-```swift
-Ness.default
-    .httpRequest(.get, withUrl: "https://myurl.com")
-    ..
-    ..
-    .prepareDataRequest()
-    .then(
-        run: { result in
-            // do something when get response
-        }, 
-        whenFailed: { result in
-            // do something when failed
-        }, 
-        finally: { result in
-            // do something when after request finished
-        }
-    )
-```
-
-You could do something similar with observer and its method reference. It will be weak refer to observer and do nothing if the observer is already deinitialised by ARC:
-```swift
-Ness.default
-    .httpRequest(.get, withUrl: "https://myurl.com")
-    ..
-    ..
-    .prepareDataRequest()
-    .then(
-        observing: self,
-        call: Some.updateTheView(withResult:),
-        whenFailedCall: Some.showFailureAlert,
-        finallyCall: Some.removeLoading
-    )
-```
-
-All of the complement method (whenFailedCall, finallyCall) are optional. Use it when you need it.
-
-You could give custom dispatcher which will be the thread where completion run:
-
-```swift
-Ness.default
-    .httpRequest(.get, withUrl: "https://myurl.com")
-    ..
-    ..
-    .prepareDataRequest()
-    .completionDispatch(on: .global(qos: .background))
-    .then { result in
-    // this block will run on DispatchQueue.global(qos: .background)
-}
-```
-
-The default dispatcher is `DispatchQueue.main`
-
-Or even without completion:
-
-```swift
-Ness.default
-    .httpRequest(.get, withUrl: "https://myurl.com")
-    ..
-    ..
-    .prepareDataRequest()
-    .executeAndForget()
-```
-
-The result is `URLResult` object which contains:
-- `urlResponse: URLResponse?` which is original response which you can read the documentation at [here](https://developer.apple.com/documentation/foundation/httpurlresponse)
-- `error: Error?` which is error if happen. it will be nil on success response
+The result is the `URLResult` object which contains:
+- `urlResponse: URLResponse?` which is the original response which you can read the documentation at [here](https://developer.apple.com/documentation/foundation/httpurlresponse)
+- `error: Error?` which is an error if happens. it will be nil on success response
 - `responseData: Data?` which is raw data of the response body
 - `isFailed: Bool` which is true if request is failed
-- `isSucceed: Bool` which is true if request is success
-- `httpMessage: HTTPResultMessage?` which is response message of the request. Will be nil if the result is not http result
+- `isSucceed: Bool` which is true if the request is succeed
+- `httpMessage: HTTPResultMessage?` which is the response message of the request. It Will be nil if the result is not an HTTP result
 
-The `HTTPResultMessage` is the detailed http response from the `URLResult`:
-- `url: HTTPURLCompatible` which is origin url of the response
+The `HTTPResultMessage` is the detailed HTTP response from the `URLResult`:
+- `url: HTTPURLCompatible` which is the origin URL of the response
 - `headers: Header` which is headers of the response
-- `body: Data?` which is body of the response
-- `statusCode: Int` which is statusCode of the response
+- `body: Data?` which is the body of the response
+- `statusCode: Int` which is the status code of the response
 
-You can get the thenable object or ignore it. It will return `HTTPRequest` which contains status of the request
+You can get the promise object or ignore it. It will return `DataPromise` which contains the status of the request
 
 ```swift
-let request = Ness.default
-    .httpRequest(.get, withUrl: "https://myurl.com")
-    ..
-    ..
-    .prepareDataRequest()
-    .executeAndForget()
-let status = request.status
+let requestPromise = Ness.default
+  .httpRequest(.get, withUrl: "https://myurl.com")
+  ..
+  ..
+  .dataRequest()
+let status = requestPromise.status
 ```
 
 The statuses are:
-- `running(Float)` which contains percentage of request progress from 0 - 1
+- `running(Float)` which contains the percentage of request progress from 0 - 1
 - `dropped`
 - `idle`
 - `completed(HTTPURLResponse)` which contains the completed response
-- `error(Error)` which contains error if there are occurs
+- `error(Error)` which contains an error if there are occurs
 
 you can cancel the request using `drop()` function:
 
 ```swift
-request.drop()
+requestPromise.drop()
 ```
 
-### Upload Request Thenable
+since the promise is based on the [Ergo](https://github.com/nayanda1/Ergo) Promise, it contains the result of the request if it already finished and an error if the error occurs:
 
-Upload request basically are the same with Data request in terms of thenable.
+```swift
+// will be nil if the request is not finished yet or if the error occurs
+let result = requestPromise.result
 
-### Download Request Thenable
+// will be nil if an error did not occur or the request is not finished yet
+let error = requestPromise.error
 
-Download request have slightly difference than data request or upload request. The download request can be paused and resumed, and the result is different
+// will be true if request completed
+print(requestPromise.isCompleted)
+```
 
-The result is `DownloadResult` object which contains:
-- `urlResponse: URLResponse?` which is original response which you can read the documentation at [here](https://developer.apple.com/documentation/foundation/httpurlresponse)
-- `error: Error?` which is error if happen. it will be nil on success response
+### Upload Request Promise
+
+Upload requests are the same as Data requests in terms of `Promise`.
+
+### Download Request Promise
+
+Download requests have a slight difference from data requests or upload requests. The download request can be paused and resumed, and the result is different
+
+The result is the `DownloadResult` object which contains:
+- `urlResponse: URLResponse?` which is the original response which you can read the documentation at [here](https://developer.apple.com/documentation/foundation/httpurlresponse)
+- `error: Error?` which is an error if happens. it will be nil on success response
 - `dataLocalURL: URL?` which is the location of downloaded data
 - `isFailed: Bool` which is true if request is failed
-- `isSucceed: Bool` which is true if request is success
+- `isSucceed: Bool` which is true if the request is succeed
 
 You can pause the download and resume:
 
 ```swift
 request.pause()
 
-let status = request.resume()
+let resumeStatus = request.resume()
 ```
 resume will return `ResumeStatus` which is enumeration:
 - `resumed`
@@ -419,8 +331,8 @@ the parseBody are accept any object that implement `ResponseDecoder`. The declar
 
 ```swift
 public protocol ResponseDecoder {
-    associatedtype Decoded
-    func decode(from data: Data) throws -> Decoded
+  associatedtype Decoded
+  func decode(from data: Data) throws -> Decoded
 }
 ```
 
@@ -428,11 +340,11 @@ so you can do something like this:
 
 ```swift
 class MyResponseDecoder: ResponseDecoder {
-    typealias Decoded = MyObject
-    
-    func decode(from data: Data) throws -> MyObject {
-        // do something to decode data into MyObject
-    }
+  typealias Decoded = MyObject
+   
+  func decode(from data: Data) throws -> MyObject {
+    // do something to decode data into MyObject
+  }
 }
 ```
 
@@ -440,19 +352,19 @@ there are default base decoder you can use if you don't want to parse from `Data
 
 ```swift
 class MyJSONResponseDecoder: BaseJSONDecoder<MyObject> {
-    typealias Decoded = MyObject
-    
-    override func decode(from json: [String: Any]) throws -> MyObject {
-        // do something to decode json into MyObject
-    }
+  typealias Decoded = MyObject
+   
+  override func decode(from json: [String: Any]) throws -> MyObject {
+    // do something to decode json into MyObject
+  }
 }
 
 class MyStringResponseDecoder: BaseStringDecoder<MyObject> {
-    typealias Decoded = MyObject
-    
-    override func decode(from string: String) throws -> MyObject {
-        // do something to decode string into MyObject
-    }
+  typealias Decoded = MyObject
+   
+  override func decode(from string: String) throws -> MyObject {
+    // do something to decode string into MyObject
+  }
 }
 ```
 
@@ -465,160 +377,62 @@ the `HTTPResultMessage` have default function to automatically parse the body wh
 - `func parseJSONBody<DOBject: Decodable>(forType type: DOBject.Type) throws -> DOBject`
 - `func parseArrayJSONBody<DObject: Decodable>(forType type: DObject.Type) throws -> [DObject]`
 
-
-### Mapped Request Thenable
-
-If you want to mapping the default result into another result, You could just call map on the any Thenable you want. Lets say you want to work with enumeration instead:
-
-```swift
-enum MyAPIResult<Object: Codable> {
-    case succeed(Object)
-    case empty
-    case fail(Error)
-}
-```
-
-Then you could mapping like this
-
-```swift
-Ness.default
-    .httpRequest(.get, withUrl: "https://myurl.com")
-    ..
-    ..
-    .prepareDataRequest()
-    .map {
-        if let error = $0.error {
-            return MyAPIResult.fail(error)
-        }
-        guard let message = $0.httpMessage else { 
-            return MyAPIResult.empty
-        }
-        do {
-            let object = try message.parseJSONBody(forType: MyObject.self)
-            return MyAPIResult.succeed(object)
-        } catch {
-            return MyAPIResult.fail(error)
-        }
-    }
-    .then { result in
-        switch result {
-            case .succeed(let object):
-            // do something
-            default:
-            // do something
-        }
-    }
-```
-
-Or even create extensions for it:
-
-```swift
-extension URLThenableRequest {
-    func mapped<Object: Codable>(for type: Object.Type) -> MappingThenable<Self, MyAPIResult<Object>> {
-        map {
-            if let error = $0.error {
-                return .fail(error)
-            }
-            guard let message = $0.httpMessage else { 
-                return .empty
-            }
-            do {
-                let object = try message.parseJSONBody(forType: type)
-                return .succeed(object)
-            } catch {
-                return .fail(error)
-            }
-        }
-    }
-}
-```
-
-And simply use it like this:
-
-```swift
-Ness.default
-    .httpRequest(.get, withUrl: "https://myurl.com")
-    ..
-    ..
-    .prepareDataRequest()
-    .mapped(for: MyObject.self)
-    .then { result in
-        switch result {
-            case .succeed(let object):
-            // do something
-            default:
-            // do something
-        }
-    }
-```
-
 ### Validator
 
 You can add validation for the response like this:
 
 ```swift
 Ness.default
-    .httpRequest(.get, withUrl: "https://myurl.com")
-    ..
-    ..
-    .prepareDataRequest()
-    .validate(statusCodes: 0..<300)
-    .validate(shouldHaveHeaders: ["Content-Type": "application/json"])
-    .then(run: { result in
-        // do something when get response
-    }, whenFailed: { result in
-        // do something when failed
-    }
-)
+  .httpRequest(.get, withUrl: "https://myurl.com")
+  ..
+  ..
+  .validate(statusCodes: 0..<300)
+  .validate(shouldHaveHeaders: ["Content-Type": "application/json"])
+  .dataRequest()
 ```
-If the response is not valid, then it will have error or dispacthed into whenFailed closure with error.
+If the response is not valid, then it will have an error or be dispatched into `handle` closure with an error.
 
 the provided validate method are:
 
 - `validate(statusCode: Int) -> Self`
 - `validate(statusCodes: Range<Int>) -> Self`
 - `validate(shouldHaveHeaders headers: [String:String]) -> Self`
+- `validate(_ validation: HeaderValidator.Validation, _ headers: [String: String]) -> Self`
 
 You can add custom validator to validate the http response. The type of validator is `URLValidator`:
 
 ```swift
-public protocol URLValidator {
-    func validate(for response: URLResponse) -> ValidationResult
+public protocol ResponseValidator {
+  func validate(for response: URLResponse) -> ResponseValidatorResult
 }
 ```
 
-`ValidationResult` is a enumeration which contains:
+`ResponseValidatorResult` is a enumeration which contains:
 - `valid`
 - `invalid`
-- `invalidWithReason(String)` invalid with custom reason which will be a description on `HTTPError` Error
+- `invalidWithReason(String)` invalid with custom reason which will be a description on `NetworkSessionError` Error
 
-and put your custom `URLValidator` like this:
+and put your custom `ResponseValidator` like this:
 
 ```swift
 Ness.default
-    .httpRequest(.get, withUrl: "https://myurl.com")
-    ..
-    ..
-    .prepareDataRequest()
-    .validate(using: MyCustomValidator())
-    .then(run: { result in
-        // do something when get response
-    }, whenFailed: { result in
-        // do something when failed
-    }
-)
+  .httpRequest(.get, withUrl: "https://myurl.com")
+  ..
+  ..
+  .validate(using: MyCustomValidator())
+  .dataRequest()
 ```
 
 You can use `HTTPValidator` if you want to validate only `HTTPURLResponse` and automatically invalidate the other:
 
 ```swift
 public protocol HTTPValidator: URLValidator {
-    func validate(forHttp response: HTTPURLResponse) -> URLValidatorResult
+  func validate(forHttp response: HTTPURLResponse) -> URLValidatorResult
 }
 ```
 
-Remember you can put as many validator as you want, which will validate the response using all those validator from the first until end or until one validator return `invalid`
-If you don't provide any `URLValidator`, then it will considered invalid if there's error or no response from the server, otherwise, all the response will be considered valid
+Remember you can put as many validators as you want, which will validate the response using all those validators from the first until the end or until one validator returns `invalid`
+If you don't provide any `URLValidator`, then it will be considered invalid if there's an error or no response from the server, otherwise, all the responses will be considered valid
 
 ### NetworkSessionManagerDelegate
 
@@ -626,12 +440,12 @@ You can manipulate request or action globally in Session level by using `Network
 
 ```swift
 public protocol NetworkSessionManagerDelegate: class {
-    func ness(_ manager: Ness, willRequest request: URLRequest) -> URLRequest
-    func ness(_ manager: Ness, didRequest request: URLRequest) -> Void
+  func ness(_ manager: Ness, willRequest request: URLRequest) -> URLRequest
+  func ness(_ manager: Ness, didRequest request: URLRequest) -> Void
 }
 ```
-both method are optional. The methods will run and functional for:
-- `ness(_: , willRequest: )` will run before any request executed. You can manipulate `URLRequest` object here and return it or doing anything prior to request and return the current `URLRequest`
+both methods are optional. The methods will run and functional for:
+- `ness(_: , willRequest: )` will run before any request executed. You can manipulate `URLRequest` object here and return it or doing anything before request and return the current `URLRequest`
 - `ness(_: , didRequest: )` will run after any request is executed, but not after the request is finished.
 
 ### RetryControl
@@ -640,7 +454,7 @@ You can control when to retry if your request is failed using `RetryControl` pro
 
 ```swift
 public protocol RetryControl {
-func shouldRetry(
+  func shouldRetry(
     for request: URLRequest, 
     response: URLResponse?, 
     error: Error, 
@@ -648,7 +462,7 @@ func shouldRetry(
 }
 ```
 
-The method will run on failure request. The only thing you need to do is passing the `RetryControlDecision` into `didHaveDecision` closure which is enumeration with members:
+The method will run on a request failure. The only thing you need to do is passing the `RetryControlDecision` into `didHaveDecision` closure which is an enumeration with members:
 - `noRetry` which will automatically fail the request
 - `retryAfter(TimeInterval)` which will retry the same request after `TimeInterval`
 - `retry` which will retry the same request immediately
@@ -657,26 +471,26 @@ You can assign `RetryControl` when preparing request:
 
 ```swift
 Ness.default
-    .httpRequest(.get, withUrl: "https://myurl.com")
-    ..
-    ..
-    .prepareDataRequest(with: myRetryControl)
+  .httpRequest(.get, withUrl: "https://myurl.com")
+  ..
+  ..
+  .dataRequest(with: myRetryControl)
 ```
-It can be applicable for download or upload request too.
+It can be applicable for download or upload requests too.
 
-iONess have some default `RetryControl` which is `CounterRetryControl` that the basic algorithm is just counting the failure time and stop retry when the counter reach the maxCount. to use it, just init the CounterRetryControl when prepare with your own maxCount or optionally with TimeInterval before retry. Example, if you want to auto retry maximum 3 times with delay 1 second for every retry:
+iONess has some default `RetryControl` which is `CounterRetryControl` that the basic algorithm is just counting the failure time and stop retry when the counter reaches the maxCount. to use it, just init the `CounterRetryControl` when preparing with your maxCount or optionally with TimeInterval before retry. For example, if you want to auto-retry maximum of 3 times with a delay of 1 second for every retry:
 
 ```swift
 Ness.default
-    .httpRequest(.get, withUrl: "https://myurl.com")
-    ..
-    ..
-    .prepareDataRequest(
-        with: CounterRetryControl(
-            maxRetryCount: 3, 
-            timeIntervalBeforeTryToRetry: 1
-        )
+  .httpRequest(.get, withUrl: "https://myurl.com")
+  ..
+  ..
+  .dataRequest(
+    with: CounterRetryControl(
+      maxRetryCount: 3, 
+      timeIntervalBeforeTryToRetry: 1
     )
+  )
 ```
 
 ### DuplicatedHandler
@@ -685,21 +499,21 @@ You can handle what to do if there are multiple duplicated request happen with `
 
 ```swift
 public protocol DuplicatedHandler {
-    func duplicatedDownload(request: URLRequest, withPreviousCompletion previousCompletion: @escaping URLCompletion<URL>, currentCompletion: @escaping URLCompletion<URL>) -> RequestDuplicatedDecision<URL>
-    func duplicatedUpload(request: URLRequest, withPreviousCompletion previousCompletion: @escaping URLCompletion<Data>, currentCompletion: @escaping URLCompletion<Data>) -> RequestDuplicatedDecision<Data>
-    func duplicatedData(request: URLRequest, withPreviousCompletion previousCompletion: @escaping URLCompletion<Data>, currentCompletion: @escaping URLCompletion<Data>) -> RequestDuplicatedDecision<Data>
+  func duplicatedDownload(request: URLRequest, withPreviousCompletion previousCompletion: @escaping URLCompletion<URL>, currentCompletion: @escaping URLCompletion<URL>) -> RequestDuplicatedDecision<URL>
+  func duplicatedUpload(request: URLRequest, withPreviousCompletion previousCompletion: @escaping URLCompletion<Data>, currentCompletion: @escaping URLCompletion<Data>) -> RequestDuplicatedDecision<Data>
+  func duplicatedData(request: URLRequest, withPreviousCompletion previousCompletion: @escaping URLCompletion<Data>, currentCompletion: @escaping URLCompletion<Data>) -> RequestDuplicatedDecision<Data>
 }
 ```
 
 It will ask for `RequestDuplicatedDecision` depending on what type of duplicated request. The `RequestDuplicatedDecision` are enumeration with members:
-- `dropAndRequestAgain` which will drop previous request and do new request with current completion
+- `dropAndRequestAgain` which will drop the previous request and do a new request with the current completion
 - `dropAndRequestAgainWithCompletion((Param?, URLResponse?, Error?) -> Void)` which will drop previous request and do new request with custom completion
 - `ignoreCurrentCompletion` which will ignore the current completion, so when the request is complete, it will just run the first request completion
 - `useCurrentCompletion` which will ignore the previous completion, so when the request is complete, it will just run the lastest request completion
-- `useBothCompletion` which will keep the previous completion, so when the request is complete, it will just run the all the request completion
+- `useBothCompletion` which will keep the previous completion, so when the request is complete, it will just run all the request completion
 - `useCompletion((Param?, URLResponse?, Error?) -> Void)` which will ignore all completion and use the custom one
 
-The duplicatedHandler are stick to the `Ness` \ `NetworkSessionManager`, so if you have duplicated request with different `Ness` \ `NetworkSessionManager`, it should not be called.
+The duplicatedHandler is stick to the `Ness` \ `NetworkSessionManager`, so if you have duplicated request with different `Ness` \ `NetworkSessionManager`, it should not be called.
 
 To assign `RequestDuplicatedDecision`, you can just assign it to `duplicatedHandler` property, or just add it when init:
 
@@ -728,45 +542,10 @@ ness.duplicatedHandler = DefaultDuplicatedHandler.keepLatestCompletion
 ```
 
 There are 4 `DefaultDuplicatedHandler`: 
-- `dropPreviousRequest` which will drop previous request and do new request with current completion
-- `keepAllCompletion` which will keep the previous completion, so when the request is complete, it will just run the all the request completion
+- `dropPreviousRequest` which will drop the previous request and do a new request with the current completion
+- `keepAllCompletion` will keep the previous completion, so when the request is complete, it will just run all the request completion
 - `keepFirstCompletion` which will ignore the current completion, so when the request is complete, it will just run the first request completion
 - `keepLatestCompletion` which will ignore the previous completion, so when the request is complete, it will just run the lastest request completion
-
-### Aggregate
-
-You can aggregate two or more request into one single Thenable like this:
-
-```swift
-request1.aggregate(with: request2)
-    .aggregate(request3)
-    .then { allResults in
-    // do something with allResults
-}
-
-//or like this
-RequestAggregator(aggregatedRequests)
-    .then { allResults in
-        // do something with allResults
-}
-```
-
-the result are `RequestAggregator.Result` which contains:
-- `results: [AggregatedResult]` which is all the completed results from aggregated requests
-- `isFailed: Bool` which will be true if one or more request is failed
-- `areCompleted: Bool` which will be true if all the request is completed
-
-You can get the request too like single Request and get its status or drop it just like one request:
-
-```swift
-let aggregatedRequests = request1.aggregate(with: request2)
-    .aggregate(request3)
-    .then { allResults in
-    // do something with allResults
-}
-let aggregatedStatus = aggregatedRequests.status
-aggregatedRequests.drop()
-```
 
 ## Contribute
 

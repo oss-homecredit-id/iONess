@@ -10,192 +10,18 @@ import Foundation
 import Quick
 import Nimble
 import iONess
+import Ergo
 
 class IntegratedTestSpec: QuickSpec {
     override func spec() {
-        it("should merge two completion") {
-            let randomNumber: Int = .random(in: 0..<10)
-            var firstResult: URLResult?
-            var secondResult: URLResult?
-            let request = Ness(onDuplicated: .keepAllCompletion)
-                .httpRequest(.get, withUrl: "https://jsonplaceholder.typicode.com/todos/\(randomNumber)")
-                .prepareDataRequest(with: CounterRetryControl(maxRetryCount: 3))
-                .validate(statusCodes: 200..<300)
-            request.then { result in
-                firstResult = result
-            }
-            waitUntil(timeout: .seconds(15)) { done in
-                request.then { result in
-                    secondResult = result
-                    done()
-                }
-            }
-            guard let fResult = firstResult,
-                  let sResult = secondResult,
-                  let fMessage = fResult.httpMessage,
-                  let sMessage = sResult.httpMessage else {
-                fail("Fail to get data")
-                return
-            }
-            expect(fResult.isSucceed).to(equal(sResult.isSucceed))
-            expect(fMessage.isHaveBody).to(equal(sMessage.isHaveBody))
-            expect(fMessage.body).to(equal(sMessage.body))
-            expect(fMessage.headers).to(equal(sMessage.headers))
-        }
-        it("should drop first completion") {
-            let randomNumber: Int = .random(in: 10..<20)
-            var firstResult: URLResult?
-            var secondResult: URLResult?
-            let request = Ness(onDuplicated: .dropPreviousRequest)
-                .httpRequest(.get, withUrl: "https://jsonplaceholder.typicode.com/todos/\(randomNumber)")
-                .prepareDataRequest(with: CounterRetryControl(maxRetryCount: 3))
-                .validate(statusCodes: 200..<300)
-            request.then { result in
-                firstResult = result
-            }
-            waitUntil(timeout: .seconds(15)) { done in
-                request.then { result in
-                    secondResult = result
-                    done()
-                }
-            }
-            guard let fResult = firstResult,
-                  let sResult = secondResult else {
-                fail("Fail to get data")
-                return
-            }
-            expect(fResult.isSucceed).to(beFalse())
-            expect(sResult.isSucceed).to(beTrue())
-        }
-        it("should use first completion") {
-            let randomNumber: Int = .random(in: 20..<30)
-            var firstResult: URLResult?
-            let request = Ness(onDuplicated: .keepFirstCompletion)
-                .httpRequest(.get, withUrl: "https://jsonplaceholder.typicode.com/todos/\(randomNumber)")
-                .prepareDataRequest(with: CounterRetryControl(maxRetryCount: 3))
-                .validate(statusCodes: 200..<300)
-            waitUntil(timeout: .seconds(15)) { done in
-                request.then { result in
-                    firstResult = result
-                    done()
-                }
-                request.then { _ in
-                    fail("This completion should not be executed")
-                    done()
-                }
-            }
-            guard let fResult = firstResult else {
-                fail("Fail to get data")
-                return
-            }
-            expect(fResult.isSucceed).to(beTrue())
-        }
-        it("should use last completion") {
-            let randomNumber: Int = .random(in: 30..<40)
-            var secondResult: URLResult?
-            let request = Ness(onDuplicated: .keepLatestCompletion)
-                .httpRequest(.get, withUrl: "https://jsonplaceholder.typicode.com/todos/\(randomNumber)")
-                .prepareDataRequest(with: CounterRetryControl(maxRetryCount: 3))
-                .validate(statusCodes: 200..<300)
-            waitUntil(timeout: .seconds(15)) { done in
-                request.then { _ in
-                    fail("This completion should not be executed")
-                    done()
-                }
-                request.then { result in
-                    secondResult = result
-                    done()
-                }
-            }
-            guard let sResult = secondResult else {
-                fail("Fail to get data")
-                return
-            }
-            expect(sResult.isSucceed).to(beTrue())
-        }
-        it("should invoke observer method") {
-            let randomNumber: Int = .random(in: 0..<10)
-            var requestResult: URLResult?
-            var observer: SpyObserver<URLResult>!
-            let request = Ness(onDuplicated: .keepAllCompletion)
-                .httpRequest(.get, withUrl: "https://jsonplaceholder.typicode.com/todos/\(randomNumber)")
-                .prepareDataRequest(with: CounterRetryControl(maxRetryCount: 3))
-                .validate(statusCodes: 200..<300)
-            waitUntil(timeout: .seconds(15)) { done in
-                observer = SpyObserver { result in
-                    requestResult = result
-                    done()
-                }
-                request.then(observing: observer, call: SpyObserver.invoke(with:))
-            }
-            guard let result = requestResult else {
-                fail("Fail to get data")
-                return
-            }
-            expect(result.isSucceed).to(beTrue())
-        }
-        it("should invoke one of observer method") {
-            let randomNumber: Int = .random(in: 0..<10)
-            var requestResult: URLResult?
-            var observer: SpyObserver<URLResult>!
-            let request = Ness(onDuplicated: .keepAllCompletion)
-                .httpRequest(.get, withUrl: "https://jsonplaceholder.typicode.com/todos/\(randomNumber)")
-                .prepareDataRequest(with: CounterRetryControl(maxRetryCount: 3))
-                .validate(statusCodes: 200..<300)
-            waitUntil(timeout: .seconds(15)) { done in
-                observer = SpyObserver { result in
-                    requestResult = result
-                    done()
-                }
-                request.then(
-                    observing: observer,
-                    call: SpyObserver.invoke(with:),
-                    whenFailedCall: SpyObserver.invoke(with:)
-                )
-            }
-            guard let result = requestResult else {
-                fail("Fail to get data")
-                return
-            }
-            expect(result.isSucceed).to(beTrue())
-        }
-        it("should invoke observer method twice") {
-            let randomNumber: Int = .random(in: 0..<10)
-            var requestResult: URLResult?
-            var observer: SpyObserver<URLResult>!
-            let request = Ness(onDuplicated: .keepAllCompletion)
-                .httpRequest(.get, withUrl: "https://jsonplaceholder.typicode.com/todos/\(randomNumber)")
-                .prepareDataRequest(with: CounterRetryControl(maxRetryCount: 3))
-                .validate(statusCodes: 200..<300)
-            waitUntil(timeout: .seconds(15)) { done in
-                observer = SpyObserver { result in
-                    requestResult = result
-                    if observer.invokedTime == 2 {
-                        done()
-                    }
-                }
-                request.then(
-                    observing: observer,
-                    call: SpyObserver.invoke(with:),
-                    whenFailedCall: SpyObserver.invoke(with:),
-                    finallyCall: SpyObserver.invoke(with:)
-                )
-            }
-            guard let result = requestResult else {
-                fail("Fail to get data")
-                return
-            }
-            expect(result.isSucceed).to(beTrue())
-            expect(observer.invokedTime).toEventually(equal(2))
-        }
         it("should get json data") {
             let randomNumber: Int = .random(in: 40..<50)
             var requestResult: URLResult?
             waitUntil(timeout: .seconds(15)) { done in
                 Ness.default
                     .httpRequest(.get, withUrl: "https://jsonplaceholder.typicode.com/todos/\(randomNumber)")
-                    .prepareDataRequest(with: CounterRetryControl(maxRetryCount: 3))
                     .validate(statusCodes: 200..<300)
+                    .dataRequest(with: CounterRetryControl(maxRetryCount: 3))
                     .then { result in
                         requestResult = result
                         done()
@@ -234,8 +60,8 @@ class IntegratedTestSpec: QuickSpec {
             waitUntil(timeout: .seconds(15)) { done in
                 Ness.default
                     .httpRequest(.get, withUrl: "https://jsonplaceholder.typicode.com/posts")
-                    .prepareDataRequest(with: CounterRetryControl(maxRetryCount: 3))
                     .validate(statusCodes: 200..<300)
+                    .dataRequest(with: CounterRetryControl(maxRetryCount: 3))
                     .then { result in
                         requestResult = result
                         done()
@@ -280,8 +106,8 @@ class IntegratedTestSpec: QuickSpec {
                 Ness.default
                     .httpRequest(.post, withUrl: "https://jsonplaceholder.typicode.com/posts")
                     .set(jsonEncodable: JSONPlaceholder(title: "foo", body: "bar", userId: randomNumber))
-                    .prepareDataRequest(with: CounterRetryControl(maxRetryCount: 3))
                     .validate(statusCodes: 200..<300)
+                    .dataRequest(with: CounterRetryControl(maxRetryCount: 3))
                     .then { result in
                         requestResult = result
                         done()
@@ -320,20 +146,19 @@ class IntegratedTestSpec: QuickSpec {
             let secondRealUrl: URL = try! "https://jsonplaceholder.typicode.com/todos/\(Int.random(in: 10..<20))".asUrl()
             let firstRequest = Ness.default
                 .httpRequest(.get, withUrl: firstRealUrl)
-                .prepareDataRequest(with: CounterRetryControl(maxRetryCount: 3))
                 .validate(statusCodes: 200..<300)
+                .dataRequest(with: CounterRetryControl(maxRetryCount: 3))
             let secondRequest = Ness.default
                 .httpRequest(.get, withUrl: secondRealUrl)
-                .prepareDataRequest(with: CounterRetryControl(maxRetryCount: 3))
                 .validate(statusCodes: 200..<300)
+                .dataRequest(with: CounterRetryControl(maxRetryCount: 3))
             var firstResult: URLResult?
             var secondResult: URLResult?
+            
             waitUntil(timeout: .seconds(15)) { done in
-                firstRequest.aggregate(with: secondRequest).then { result in
-                    expect(result.areCompleted).to(beTrue())
-                    expect(result.results.count).to(equal(2))
-                    firstResult = result.results[0]
-                    secondResult = result.results[1]
+                waitPromises(from: firstRequest, secondRequest).then { result in
+                    firstResult = result.0
+                    secondResult = result.1
                     done()
                 }
             }
@@ -344,29 +169,6 @@ class IntegratedTestSpec: QuickSpec {
             expect(firstUrl).toNot(equal(secondUrl))
             expect(firstUrl == firstRealUrl || firstUrl == secondRealUrl).to(beTrue())
             expect(secondUrl == firstRealUrl || secondUrl == secondRealUrl).to(beTrue())
-        }
-        it("should mapping thenable") {
-            let randomNumber: Int = .random(in: 40..<50)
-            var mappedResult: JSONPlaceholder?
-            waitUntil(timeout: .seconds(15)) { done in
-                Ness.default
-                    .httpRequest(.get, withUrl: "https://jsonplaceholder.typicode.com/todos/\(randomNumber)")
-                    .prepareDataRequest(with: CounterRetryControl(maxRetryCount: 3))
-                    .validate(statusCodes: 200..<300)
-                    .map { try? $0.httpMessage?.parseJSONBody(forType: JSONPlaceholder.self) }
-                    .then { result in
-                        mappedResult = result as? JSONPlaceholder
-                        done()
-                    }
-            }
-            guard let obj = mappedResult else {
-                fail("Fail to get data")
-                return
-            }
-            expect(obj.userId).to(beGreaterThan(0))
-            expect(obj.id).to(equal(randomNumber))
-            expect(obj.body).to(beNil())
-            expect(obj.title.isEmpty).toNot(beTrue())
         }
     }
 }

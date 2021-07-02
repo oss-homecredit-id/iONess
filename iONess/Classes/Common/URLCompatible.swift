@@ -7,12 +7,20 @@
 
 import Foundation
 
+/// Protocol to make project can be treated as URL
 public protocol URLCompatible {
+    /// Convert object to URL
     func asUrl() throws -> URL
+    /// Convert object to URL with given parameters
+    /// - Parameter parameters: URL Parameters
     func asUrl(with parameters: HTTPRequestMessage.URLParameters) throws -> URL
 }
 
 extension String: URLCompatible {
+    /// Convert object to URL with given parameters
+    /// - Parameter parameters: URL Parameters
+    /// - Throws: NetworkSessionError
+    /// - Returns: URL object
     public func asUrl(with parameters: HTTPRequestMessage.URLParameters) throws -> URL {
         var constructedURL: String = ""
         for parameter in parameters {
@@ -31,6 +39,9 @@ extension String: URLCompatible {
         return url
     }
     
+    /// Convert object to URL with given parameters
+    /// - Throws: NetworkSessionError
+    /// - Returns: URL object
     public func asUrl() throws -> URL {
         guard let url = URL(string: self) else {
             throw NetworkSessionError(description: "iONess Error: invalid url \"\(self)\"")
@@ -40,16 +51,25 @@ extension String: URLCompatible {
 }
 
 extension URL: URLCompatible {
+    /// Convert object to URL with given parameters
+    /// - Parameter parameters: URL Parameters
+    /// - Throws: NetworkSessionError
+    /// - Returns: URL object
     public func asUrl(with parameters: HTTPRequestMessage.URLParameters) throws -> URL {
         try absoluteString.asUrl(with: parameters)
     }
     
+    /// Convert object to URL with given parameters
+    /// - Throws: NetworkSessionError
+    /// - Returns: URL object
     public func asUrl() throws -> URL {
         return self
     }
 }
 
 public extension URL {
+    /// Convert URL into mutable Request
+    /// - Returns: NSMutableURLRequest
     func asMutableRequest() -> NSMutableURLRequest {
         NSMutableURLRequest(url: self)
     }

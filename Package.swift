@@ -6,7 +6,7 @@ import PackageDescription
 let package = Package(
     name: "iONess",
     platforms: [
-        .iOS(.v8),
+        .iOS(.v10),
         .macOS(.v10_10),
         .tvOS(.v10)
     ],
@@ -17,13 +17,14 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(url: "https://github.com/Quick/Quick.git", from: "3.0.0"),
-        .package(url: "https://github.com/Quick/Nimble.git", from: "9.0.0")
+        .package(url: "https://github.com/nayanda1/Ergo.git", from: "1.0.2"),
+        .package(url: "https://github.com/Quick/Quick.git", from: "4.0.0"),
+        .package(url: "https://github.com/Quick/Nimble.git", from: "9.2.0")
     ],
     targets: [
         .target(
             name: "iONess",
-            dependencies: [],
+            dependencies: ["Ergo"],
             path: "iONess/Classes"
         ),
         .testTarget(
