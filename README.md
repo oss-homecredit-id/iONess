@@ -4,6 +4,7 @@ iONess (iOS Network Session) is HTTP Request Helper for the iOS platform used by
 
 ![build](https://github.com/oss-homecredit-id/iONess/workflows/build/badge.svg)
 ![test](https://github.com/oss-homecredit-id/iONess/workflows/test/badge.svg)
+[![SwiftPM Compatible](https://img.shields.io/badge/SwiftPM-Compatible-brightgreen)](https://swift.org/package-manager/)
 [![Version](https://img.shields.io/cocoapods/v/iONess.svg?style=flat)](https://cocoapods.org/pods/iONess)
 [![License](https://img.shields.io/cocoapods/l/iONess.svg?style=flat)](https://cocoapods.org/pods/iONess)
 [![Platform](https://img.shields.io/cocoapods/p/iONess.svg?style=flat)](https://cocoapods.org/pods/iONess)
