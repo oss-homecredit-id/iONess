@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import Ergo
 
 /// Request Builder
 open class RequestBuilder {
