@@ -1,15 +1,18 @@
 PODS:
-  - iONess (1.2.4)
-  - Nimble (9.0.0)
-  - Quick (3.0.0)
+  - Ergo (1.0.2)
+  - iONess (2.0.0):
+    - Ergo (~> 1.0.2)
+  - Nimble (9.2.0)
+  - Quick (4.0.0)
 
 DEPENDENCIES:
   - iONess (from `../`)
-  - Nimble (~> 9.0.0)
-  - Quick (~> 3.0.0)
+  - Nimble (~> 9.2.0)
+  - Quick (~> 4.0.0)
 
 SPEC REPOS:
   trunk:
+    - Ergo
     - Nimble
     - Quick
 
@@ -18,10 +21,11 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  iONess: 9e06bc3f82ae1cdb9dc58c8854b2181c1f637f27
-  Nimble: 3b4ec3fd40f1dc178058e0981107721c615643d8
-  Quick: 6d9559f40647bc4d510103842ef2fdd882d753e2
+  Ergo: a2c4c019153adc9b75c9186626abc9aa02bdb817
+  iONess: 611a8b7ae94aec1b658bc371bcd1a7b854255a36
+  Nimble: 4f4a345c80b503b3ea13606a4f98405974ee4d0b
+  Quick: 6473349e43b9271a8d43839d9ba1c442ed1b7ac4
 
-PODFILE CHECKSUM: 8144533663cf8b140228454000f3f11dde5ede15
+PODFILE CHECKSUM: fb784a47366124840c3648697a944e35023680d1
 
 COCOAPODS: 1.10.1

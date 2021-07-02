@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'iONess'
-  s.version          = '1.2.5'
+  s.version          = '2.0.0'
   s.summary          = 'iOS Network Session'
 
 # This description is used to generate tags and improve search results.
@@ -28,7 +28,7 @@ Pod::Spec.new do |s|
   s.source           = { :git => 'https://github.com/oss-homecredit-id/iONess.git', :tag => s.version.to_s }
   # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
 
-  s.ios.deployment_target = '8.0'
+  s.ios.deployment_target = '10.0'
 
   s.source_files = 'iONess/Classes/**/*'
   
@@ -39,5 +39,6 @@ Pod::Spec.new do |s|
   # s.public_header_files = 'Pod/Classes/**/*.h'
   # s.frameworks = 'UIKit', 'MapKit'
   # s.dependency 'AFNetworking', '~> 2.3'
+  s.dependency 'Ergo', '~> 1.0.2'
   s.swift_version = '5.1'
 end
