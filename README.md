@@ -1,6 +1,6 @@
 # iONess
 
-iONess (iOS Network Session) is HTTP Request Helper for the iOS platform used by Home Credit Indonesia iOS App. It using [Ergo](https://github.com/nayanda1/Ergo) as a concurrent helper and promise pipelining.
+iONess (iOS Network Session) is HTTP Request Helper for the iOS platform used by Home Credit Indonesia iOS App. It using [Ergo](https://github.com/hainayanda/Ergo) as a concurrent helper and promise pipelining.
 
 ![build](https://github.com/oss-homecredit-id/iONess/workflows/build/badge.svg)
 ![test](https://github.com/oss-homecredit-id/iONess/workflows/test/badge.svg)
@@ -33,7 +33,7 @@ iONess is available through [CocoaPods](https://cocoapods.org). To install it, s
 for iOS 10 or higher
 
 ```ruby
-pod 'iONess', '~> 2.0.0'
+pod 'iONess', '~> 2.0'
 ```
 
 or for iOS 8 or higher
@@ -46,16 +46,16 @@ pod 'iONess', '~> 1.2.5'
 
 - Add it using xcode menu **File > Swift Package > Add Package Dependency**
 - Add **https://github.com/oss-homecredit-id/iONess.git** as Swift Package url
-- Set rules at **version**, with **Up to Next Major** option and put **2.0.0** as its version for iOS 10 or higher or **1.2.5** for iOS 8 or higher
+- Set rules at **version**, with **Up to Next Major** option and put **2.0.1** as its version for iOS 10 or higher or **1.2.5** for iOS 8 or higher
 - Click next and wait
 
 ### Swift Package Manager from Package.swift
 
-Add as your target dependency in **Package.swift**. Use **2.0.0** as its version for iOS 10 or higher or **1.2.5** for iOS 8 or higher
+Add as your target dependency in **Package.swift**. Use **2.0.1** as its version for iOS 10 or higher or **1.2.5** for iOS 8 or higher
 
 ```swift
 dependencies: [
-  .package(url: "https://github.com/oss-homecredit-id/iONess.git", .upToNextMajor(from: "2.0.0"))
+  .package(url: "https://github.com/oss-homecredit-id/iONess.git", .upToNextMajor(from: "2.0.1"))
 ]
 ```
 
@@ -71,7 +71,7 @@ Use it in your target as `iONess`
 ## Contributor
 
 - Home Credit Indonesia, iOS Teams
-- nayanda, nayanda1@outlook.com
+- nayanda, hainayanda@outlook.com
 
 ## License
 
@@ -101,7 +101,7 @@ Ness.default
 ```
 
 When data `dataRequest()` is called, it will always execute the request right away no matter it have completion or not.
-`dataRequest()` actually returning `Promise` object from [Ergo](https://github.com/nayanda1/Ergo) so you could always do everything you can do with `Ergo Promise`:
+`dataRequest()` actually returning `Promise` object from [Ergo](https://github.com/hainayanda/Ergo) so you could always do everything you can do with `Ergo Promise`:
 
 ```swift
 Ness.default
@@ -116,7 +116,7 @@ Ness.default
   }
 ```
 
-You could always check [Ergo here](https://github.com/nayanda1/Ergo) about what its promise can do.
+You could always check [Ergo here](https://github.com/hainayanda/Ergo) about what its promise can do.
 
 ### Create Request
 
@@ -282,7 +282,7 @@ you can cancel the request using `drop()` function:
 requestPromise.drop()
 ```
 
-since the promise is based on the [Ergo](https://github.com/nayanda1/Ergo) Promise, it contains the result of the request if it already finished and an error if the error occurs:
+since the promise is based on the [Ergo](https://github.com/hainayanda/Ergo) Promise, it contains the result of the request if it already finished and an error if the error occurs:
 
 ```swift
 // will be nil if the request is not finished yet or if the error occurs
