@@ -21,11 +21,11 @@
       },
       {
         "package": "Ergo",
-        "repositoryURL": "https://github.com/nayanda1/Ergo.git",
+        "repositoryURL": "https://github.com/hainayanda/Ergo.git",
         "state": {
           "branch": null,
-          "revision": "8d49aa2737becd4a93b9b371410a3ebae7007d81",
-          "version": "1.0.2"
+          "revision": "4ffc0fe9a8d258f71707a3526c2b716c2860b007",
+          "version": "1.0.3"
         }
       },
       {
