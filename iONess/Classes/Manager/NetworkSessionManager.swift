@@ -79,7 +79,7 @@ open class NetworkSessionManager {
 public typealias NessDelegate = NetworkSessionManagerDelegate
 
 /// NetworkSessionManagerDelegate
-public protocol NetworkSessionManagerDelegate: class {
+public protocol NetworkSessionManagerDelegate: AnyObject {
     /// Perform manipulation before each request
     /// - Parameters:
     ///   - manager: NetworkSessionManager
