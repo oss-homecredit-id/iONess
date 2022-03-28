@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'iONess'
-  s.version          = '2.0.1'
+  s.version          = '2.0.2'
   s.summary          = 'iOS Network Session'
 
 # This description is used to generate tags and improve search results.
