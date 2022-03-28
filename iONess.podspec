@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'iONess'
-  s.version          = '2.0.0'
+  s.version          = '2.0.1'
   s.summary          = 'iOS Network Session'
 
 # This description is used to generate tags and improve search results.
@@ -24,7 +24,7 @@ Pod::Spec.new do |s|
   s.homepage         = 'https://github.com/oss-homecredit-id/iONess'
   # s.screenshots     = 'www.example.com/screenshots_1', 'www.example.com/screenshots_2'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
-  s.author           = { 'nayanda' => 'nayanda1@outlook.com' }
+  s.author           = { 'nayanda' => 'hainayanda@outlook.com' }
   s.source           = { :git => 'https://github.com/oss-homecredit-id/iONess.git', :tag => s.version.to_s }
   # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
 
@@ -39,6 +39,6 @@ Pod::Spec.new do |s|
   # s.public_header_files = 'Pod/Classes/**/*.h'
   # s.frameworks = 'UIKit', 'MapKit'
   # s.dependency 'AFNetworking', '~> 2.3'
-  s.dependency 'Ergo', '~> 1.0.2'
+  s.dependency 'Ergo', '~> 1.0.3'
   s.swift_version = '5.1'
 end
