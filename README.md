@@ -46,16 +46,16 @@ pod 'iONess', '~> 1.2.5'
 
 - Add it using xcode menu **File > Swift Package > Add Package Dependency**
 - Add **https://github.com/oss-homecredit-id/iONess.git** as Swift Package url
-- Set rules at **version**, with **Up to Next Major** option and put **2.0.1** as its version for iOS 10 or higher or **1.2.5** for iOS 8 or higher
+- Set rules at **version**, with **Up to Next Major** option and put **2.0.2** as its version for iOS 10 or higher or **1.2.5** for iOS 8 or higher
 - Click next and wait
 
 ### Swift Package Manager from Package.swift
 
-Add as your target dependency in **Package.swift**. Use **2.0.1** as its version for iOS 10 or higher or **1.2.5** for iOS 8 or higher
+Add as your target dependency in **Package.swift**. Use **2.0.2** as its version for iOS 10 or higher or **1.2.5** for iOS 8 or higher
 
 ```swift
 dependencies: [
-  .package(url: "https://github.com/oss-homecredit-id/iONess.git", .upToNextMajor(from: "2.0.1"))
+  .package(url: "https://github.com/oss-homecredit-id/iONess.git", .upToNextMajor(from: "2.0.2"))
 ]
 ```
 
