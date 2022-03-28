@@ -1,6 +1,6 @@
 # iONess
 
-iONess (iOS Network Session) is HTTP Request Helper for the iOS platform used by Home Credit Indonesia iOS App. It using [Ergo](https://github.com/hainayanda/Ergo) as a concurrent helper and promise pipelining.
+iONess (iOS Network Session) is HTTP Request Helper for the iOS platform used by Home Credit Indonesia iOS App. It uses [Ergo](https://github.com/hainayanda/Ergo) as a concurrent helper and promise pipelining.
 
 ![build](https://github.com/oss-homecredit-id/iONess/workflows/build/badge.svg)
 ![test](https://github.com/oss-homecredit-id/iONess/workflows/test/badge.svg)
@@ -45,7 +45,7 @@ pod 'iONess', '~> 1.2.5'
 ### Swift Package Manager from XCode
 
 - Add it using xcode menu **File > Swift Package > Add Package Dependency**
-- Add **https://github.com/oss-homecredit-id/iONess.git** as Swift Package url
+- Add **https://github.com/oss-homecredit-id/iONess.git** as Swift Package URL
 - Set rules at **version**, with **Up to Next Major** option and put **2.0.2** as its version for iOS 10 or higher or **1.2.5** for iOS 8 or higher
 - Click next and wait
 
@@ -81,7 +81,7 @@ iONess is available under the MIT license. See the LICENSE file for more info.
 
 ### Basic Usage
 
-`iONess` is designed to simplify the request process for HTTP Request. All you need to do is just create the request using `Ness` / `NetworkSessionManager` class:
+`iONess` is designed to simplify the request process for HTTP Requests. All you need to do is just create the request using `Ness` / `NetworkSessionManager` class:
 
 ```swift
 Ness.default
@@ -100,7 +100,7 @@ Ness.default
   .dataRequest()
 ```
 
-When data `dataRequest()` is called, it will always execute the request right away no matter it have completion or not.
+When data `dataRequest()` is called, it will always execute the request right away no matter it has completion or not.
 `dataRequest()` actually returning `Promise` object from [Ergo](https://github.com/hainayanda/Ergo) so you could always do everything you can do with `Ergo Promise`:
 
 ```swift
@@ -120,7 +120,7 @@ You could always check [Ergo here](https://github.com/hainayanda/Ergo) about wha
 
 ### Create Request
 
-To create request you can do something like this:
+To create a request you can do something like this:
 
 ```swift
 Ness.default.httpRequest(.get, withUrl: "https://myurl.com")
@@ -167,7 +167,7 @@ available enumeration for HTTP Method to use are:
 - `none` if you don't want to include HTTP Method header
 - `custom(String)`
 
-to set custom type of body, you need to pass those custom type encoder which implement `HTTPBodyEncoder` object to encode the object into the data:
+to set a custom type of body, you need to pass those custom type encoder that implements `HTTPBodyEncoder` object to encode the object into the data:
 
 ```swift
 Ness.default.httpRequest(.get, withUrl: "https://myurl.com")
@@ -184,7 +184,7 @@ public protocol HTTPBodyEncoder {
   func encoder(_ any: Any) throws -> Data
 }
 ```
-the `relatedHeaders` is the associated header with this encoding which will auto-assigned to the request headers. this variable is optional since the default implementation are returning nil
+the `relatedHeaders` is the associated header with this encoding which will be auto-assigned to the request headers. this variable is optional since the default implementation are returning nil
 
 there some different default method to set the body with iONess default body encoder which are:
 - `func set(body: Data) -> Self`
@@ -205,7 +205,7 @@ Ness.default.httpRequest(.get, withUrl: "https://myurl.com")
   ..
   .dataRequest()
 ```
-or for download, you need to give target location `URL` where you want to downloaded data to be saved:
+or for download, you need to give the target location `URL` where you want to downloaded data to be saved:
 
 ```swift
 Ness.default.httpRequest(.get, withUrl: "https://myurl.com")
@@ -217,7 +217,7 @@ Ness.default.httpRequest(.get, withUrl: "https://myurl.com")
   .downloadRequest(forSavedLocation: myTargetUrl)
 ```
 
-or for updload you need to give file location `URL` which you want to upload:
+or for upload you need to give file location `URL` which you want to upload:
 
 ```swift
 Ness.default.httpRequest(.get, withUrl: "https://myurl.com")
@@ -231,7 +231,7 @@ Ness.default.httpRequest(.get, withUrl: "https://myurl.com")
 
 ### Data Request Promise
 
-After creating data request, you can just execute the request with then method:
+After creating a data request, you can just execute the request with then method:
 
 ```swift
 Ness.default
@@ -447,7 +447,7 @@ public protocol NetworkSessionManagerDelegate: class {
 }
 ```
 both methods are optional. The methods will run and functional for:
-- `ness(_: , willRequest: )` will run before any request executed. You can manipulate `URLRequest` object here and return it or doing anything before request and return the current `URLRequest`
+- `ness(_: , willRequest: )` will run before any request executed. You can manipulate `URLRequest` object here and return it or do anything before request and return the current `URLRequest`
 - `ness(_: , didRequest: )` will run after any request is executed, but not after the request is finished.
 
 ### RetryControl
@@ -464,12 +464,12 @@ public protocol RetryControl {
 }
 ```
 
-The method will run on a request failure. The only thing you need to do is passing the `RetryControlDecision` into `didHaveDecision` closure which is an enumeration with members:
+The method will run on a request failure. The only thing you need to do is pass the `RetryControlDecision` into `didHaveDecision` closure which is an enumeration with members:
 - `noRetry` which will automatically fail the request
 - `retryAfter(TimeInterval)` which will retry the same request after `TimeInterval`
 - `retry` which will retry the same request immediately
 
-You can assign `RetryControl` when preparing request:
+You can assign `RetryControl` when preparing a request:
 
 ```swift
 Ness.default
@@ -480,7 +480,7 @@ Ness.default
 ```
 It can be applicable for download or upload requests too.
 
-iONess has some default `RetryControl` which is `CounterRetryControl` that the basic algorithm is just counting the failure time and stop retry when the counter reaches the maxCount. to use it, just init the `CounterRetryControl` when preparing with your maxCount or optionally with TimeInterval before retry. For example, if you want to auto-retry maximum of 3 times with a delay of 1 second for every retry:
+iONess has some default `RetryControl` which is `CounterRetryControl` that the basic algorithm is just counting the failure time and stop retry when the counter reaches the maxCount. to use it, just init the `CounterRetryControl` when preparing with your maxCount or optionally with TimeInterval before retry. For example, if you want to auto-retry a maximum of 3 times with a delay of 1 second for every retry:
 
 ```swift
 Ness.default
