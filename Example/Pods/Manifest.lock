@@ -1,6 +1,6 @@
 PODS:
   - Ergo (1.3.0)
-  - iONess (2.0.0):
+  - iONess (2.0.1):
     - Ergo (~> 1.3.0)
   - Nimble (9.2.1)
   - Quick (4.0.0)
@@ -22,7 +22,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Ergo: c3b864223c59e0a656ad75f7497b1a8e238fc7da
-  iONess: 7d1096d13725463e491352f34d889d629c185eaa
+  iONess: bc7cd5c3007b0e1f0bd7e2ec6629d66b7bafa9a6
   Nimble: e7e615c0335ee4bf5b0d786685451e62746117d5
   Quick: 6473349e43b9271a8d43839d9ba1c442ed1b7ac4
 
